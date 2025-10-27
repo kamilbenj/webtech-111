@@ -1,86 +1,88 @@
 📰 MyBlog
 
-MyBlog est une application de blog moderne construite avec Next.js, React, TypeScript et Tailwind CSS.
-Elle inclut une navigation fluide, une barre de recherche interactive, et des pages simples pour les articles, le contact et la découverte de contenu.
+MyBlog is a modern blog application built with Next.js, React, TypeScript, and Tailwind CSS.
+It includes smooth navigation, an interactive search bar, and simple pages for posts, contact, and content discovery.
 
-🚀 Fonctionnalités
+🚀 Features
 
-Interface moderne et responsive avec Tailwind CSS
+Modern and responsive interface with Tailwind CSS
 
-Navigation dynamique grâce au composant Header
+Dynamic navigation via the Header component
 
-Barre de recherche animée
+Animated search bar
 
-Liste d’articles avec extraits et liens individuels
+Post list with excerpts and individual links
 
-Pages de contact et d’informations
+Contact and information pages
 
-Composants réutilisables (Header, Footer, etc.)
+Reusable components (Header, Footer, etc.)
 
-🧩 Structure du projet
+🧩 Project Structure
 myblog/
-├── app/
-│   ├── page.tsx              # Page principale "Discover"
-│   ├── posts/page.tsx        # Page listant les articles
-│   ├── contact/page.tsx      # Page de contact
-│   ├── about/page.tsx        # (optionnelle) Page à propos
-│   ├── components/
-│   │   ├── Header.tsx        # Barre de navigation
-│   │   └── Footer.tsx        # Pied de page
-│   └── globals.css           # Styles globaux (inclut Tailwind)
-├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-└── README.md
 
-Aperçu des composants
-Header
+app/
+  - components/
+    -- Header.tsx
+    -- Footer.tsx
+  - posts/
+    -- page.tsx
+  - contact/
+    -- page.tsx
+  - about/
+    -- page.tsx
+  - page.tsx
+  - layout.tsx
+  - globals.css
 
-Composant de navigation comprenant :
+🔍 Component Overview
+🧭 Header
 
-un logo,
+Navigation component including:
 
-un menu de liens (Discover, Posts, Contact, About),
+a logo
 
-une barre de recherche dynamique avec animation lors du focus,
+a link menu (Discover, Posts, Contact, About)
 
-un bouton Sign up.
+a dynamic search bar with focus animation
 
+a Sign up button
 
-🛠️ Installation et exécution
-1. Cloner le dépôt
-git clone https://github.com/ton-utilisateur/myblog.git
+🛠️ Installation & Setup
+1. Clone the repository
+git clone https://github.com/your-username/myblog.git
 cd myblog
 
-2. Installer les dépendances
+2. Install dependencies
 npm install
 
-
-3. Lancer le serveur de développement
+3. Run the development server
 npm run dev
 
 
-Ouvre http://localhost:3000
- pour voir ton site.
+Open http://localhost:3000
+ in your browser to view the site.
 
-🎨 Technologies utilisées
-Technologie	Description
-Next.js	Framework React pour les applications modernes et rapides
-TypeScript	Typage statique pour un code plus robuste
-Tailwind CSS	Framework CSS utilitaire pour un design moderne et responsive
-React Hooks	Gestion simple de l’état et des effets
-🧰 Scripts disponibles
-Commande	Description
-npm run dev	Lance le serveur de développement
-npm run build	Crée une version de production
-npm run start	Démarre le serveur de production
-npm run lint	Vérifie le code avec ESLint
-📜 Licence
+🎨 Technologies Used
 
-Ce projet est sous licence MIT.
-Tu es libre de l’utiliser, le modifier et le distribuer comme bon te semble.
+Technology	Description
+Next.js	React framework for modern and fast web apps
+TypeScript	Static typing for safer and cleaner code
+Tailwind CSS	Utility-first CSS framework for responsive design
+React Hooks	Simple state and effect management
 
-👨‍💻 Auteur
+🧰 Available Scripts
 
-MyBlog — un projet Next.js minimaliste pour apprendre et expérimenter.
-💡 Inspiré par les blogs modernes, construit avec passion.
+Command	Description
+npm run dev	Starts the development server
+npm run build	Builds the app for production
+npm run start	Runs the production server
+npm run lint	Checks the code with ESLint
+
+📜 License
+
+This project is licensed under the MIT License.
+You are free to use, modify, and distribute it as you wish.
+
+👨‍💻 Author
+
+Gabriel DALIBERT – ECE
