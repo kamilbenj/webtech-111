@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+📰 MyBlog
 
-## Getting Started
+MyBlog is a modern blog application built with Next.js, React, TypeScript, and Tailwind CSS.
+It includes smooth navigation, an interactive search bar, and simple pages for posts, contact, and content discovery.
 
-First, run the development server:
+🚀 Features
 
-```bash
+Modern and responsive interface with Tailwind CSS
+
+Dynamic navigation via the Header component
+
+Animated search bar
+
+Post list with excerpts and individual links
+
+Contact and information pages
+
+Reusable components (Header, Footer, etc.)
+
+🧩 Project Structure
+myblog/
+
+app/
+  - components/
+    -- Header.tsx
+    -- Footer.tsx
+  - posts/
+    -- page.tsx
+  - contact/
+    -- page.tsx
+  - about/
+    -- page.tsx
+  - page.tsx
+  - layout.tsx
+  - globals.css
+
+🔍 Component Overview
+🧭 Header
+
+Navigation component including:
+
+a logo
+
+a link menu (Discover, Posts, Contact, About)
+
+a dynamic search bar with focus animation
+
+a Sign up button
+
+🛠️ Installation & Setup
+1. Clone the repository
+git clone https://github.com/your-username/myblog.git
+cd myblog
+
+2. Install dependencies
+npm install
+
+3. Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Open http://localhost:3000
+ in your browser to view the site.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🎨 Technologies Used
 
-## Learn More
+Technology	Description
+Next.js	React framework for modern and fast web apps
+TypeScript	Static typing for safer and cleaner code
+Tailwind CSS	Utility-first CSS framework for responsive design
+React Hooks	Simple state and effect management
 
-To learn more about Next.js, take a look at the following resources:
+🧰 Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Command	Description
+npm run dev	Starts the development server
+npm run build	Builds the app for production
+npm run start	Runs the production server
+npm run lint	Checks the code with ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+📜 License
 
-## Deploy on Vercel
+This project is licensed under the MIT License.
+You are free to use, modify, and distribute it as you wish.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+👨‍💻 Author
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Gabriel DALIBERT – ECE
