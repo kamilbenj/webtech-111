@@ -2,3 +2,4 @@
 supabase/config.toml
 supabase/.temp
 supabase/.branchessupabase/.gitignore
+supabase/.gitignore
