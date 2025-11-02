@@ -39,17 +39,20 @@ client/
 ```bash
 git clone https://github.com/<your-username>/<your-repo>.git
 cd client
-2️. Install dependencies
+```
+### 2️. Install dependencies
 ```bash
 npm install
+```
 ### 3. Create environment variables
+```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
-
+```
 You can find these values in your Supabase dashboard under
 Settings → API → Project URL and anon public key.
 
-Useful Commands
+## Useful Commands
 | Command       | Description                           |
 | ------------- | ------------------------------------- |
 | npm run dev   | Start the project in development mode |
@@ -57,7 +60,7 @@ Useful Commands
 | npm start     | Run the production server             |
 | vercel --prod | Deploy the app to Vercel              |
 
-Technologies
+## Technologies
 | Category           | Technology              |
 | ------------------ | ----------------------- |
 | Frontend Framework | Next.js 15+             |
@@ -66,10 +69,12 @@ Technologies
 | Language           | TypeScript              |
 | Styling (optional) | TailwindCSS / Bootstrap |
 
-Server-Side Authentication (SSR)
+## Server-Side Authentication (SSR)
 
 The app uses:
+```bash
 @supabase/auth-helpers-nextjs
+```
 This library allows:
 
 Persistent sessions between client and server
@@ -78,7 +83,7 @@ Automatic cookie synchronization (sb-access-token, sb-refresh-token)
 
 Route protection via middleware
 
-Deployment on Vercel
+## Deployment on Vercel
 
 Connect your GitHub repository to Vercel.
 
@@ -99,7 +104,8 @@ Enter your email
 Click the magic link you receive
 
 You’ll be redirected to /feed, a protected page accessible only when authenticated
-Author
+
+## Author
 
 Project created by Kamil Benjelloun
 
