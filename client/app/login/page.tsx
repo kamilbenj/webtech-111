@@ -24,7 +24,7 @@ export default function LoginPage() {
         appearance={{ theme: ThemeSupa }}
         view="magic_link"
         magicLink
-        redirectTo={`${location.origin}/auth/callback`} // ✅ pour poser les cookies côté SSR
+        redirectTo={typeof window !== 'undefined' ? `${location.origin}/auth/callback` : undefined} // ✅ pour poser les cookies côté SSR
       />
     </div>
   );
