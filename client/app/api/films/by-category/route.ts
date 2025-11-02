@@ -19,12 +19,22 @@ export async function POST(req: Request) {
 
   const { data: links } = await supabase
     .from('film_categories')
-    .select('films(id,title,poster_url), category_id')
-    .in('category_id', catIds);
+    .select('films(id,title,poster_url), category_id');
 
-  const filmsMap = new Map<number, { id:number; title:string; poster_url:string|null }>();
-  (links ?? []).forEach((row: any) => {
-    if (row.films) filmsMap.set(row.films.id, row.films);
+  type FilmRow = {
+    films?: {
+      id: number;
+      title: string;
+      poster_url: string | null;
+    } | null;
+    category_id?: number | null;
+  };
+
+  const filmsMap = new Map<number, { id: number; title: string; poster_url: string | null }>();
+  ((links as FilmRow[] | null) ?? []).forEach((row) => {
+    if (row.films) {
+      filmsMap.set(row.films.id, row.films);
+    }
   });
 
   return NextResponse.json(Array.from(filmsMap.values()), { status: 200 });
