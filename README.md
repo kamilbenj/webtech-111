@@ -17,6 +17,7 @@ The app is deployed on Vercel and uses Supabase Cloud as its backend.
 ---
 
 ## Project Structure
+```bash
 client/
 ├── app/
 │ ├── login/ → Supabase login page
