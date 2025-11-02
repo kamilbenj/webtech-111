@@ -107,7 +107,7 @@ You’ll be redirected to /feed, a protected page accessible only when authentic
 
 ## Author
 
-Project created by Kamil Benjelloun
+Kamil Benjelloun , Gabriel DALIBERT , Rayan GAAD
 
 ## License
 
