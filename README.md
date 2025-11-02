@@ -109,12 +109,12 @@ You’ll be redirected to /feed, a protected page accessible only when authentic
 
 Project created by Kamil Benjelloun
 
-License
+## License
 
 This project is released under the MIT License.
 You can modify and redistribute it freely as long as you keep the author’s attribution.
 
-Troubleshooting
+## Troubleshooting
 
 404 after clicking the magic link:
 Check if /auth/callback exists and if Supabase Redirect URLs include it.
