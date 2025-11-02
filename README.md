@@ -31,7 +31,7 @@ client/
 ├── middleware.ts → Middleware to sync Supabase session & cookies
 ├── package.json
 └── README.md
-
+```
 ---
 
 ## Installation & Setup
