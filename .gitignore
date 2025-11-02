@@ -1,4 +1,4 @@
 .DS_Store
 supabase/config.toml
 supabase/.temp
-supabase/.branches
+supabase/.branchessupabase/.gitignore
