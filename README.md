@@ -39,7 +39,7 @@ client/
 ```bash
 git clone https://github.com/<your-username>/<your-repo>.git
 cd client
-### 2. Install dependencies
+2️⃣ Install dependencies
 npm install
 ### 3. Create environment variables
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
