@@ -9,10 +9,11 @@ export async function GET(req: Request) {
     const supabase = await createServerSupabase();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      console.error('exchangeCodeForSession error:', error.message);
+      console.error('Error exchanging code for session:', error.message);
       return NextResponse.redirect(new URL('/login?error=auth', origin));
     }
   }
 
+  // une fois connecté → redirection vers le feed
   return NextResponse.redirect(new URL('/feed', origin));
 }

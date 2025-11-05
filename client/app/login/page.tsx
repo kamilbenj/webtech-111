@@ -1,31 +1,23 @@
 'use client';
-export const dynamic = 'force-dynamic';
 
-import { supabase } from '@/lib/supabaseClient';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function LoginPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') router.push('/feed');
-    });
-    return () => subscription.unsubscribe();
-  }, [router]);
-
   return (
-    <div className="max-w-sm mx-auto py-16">
-      <Auth
-        supabaseClient={supabase}
-        appearance={{ theme: ThemeSupa }}
-        view="magic_link"
-        magicLink
-        redirectTo={typeof window !== 'undefined' ? `${location.origin}/auth/callback` : undefined} // ✅ pour poser les cookies côté SSR
-      />
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="max-w-md w-full bg-white shadow-md rounded-2xl p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+        <Auth
+          supabaseClient={supabase}
+          appearance={{ theme: ThemeSupa }}
+          view="magic_link"
+          showLinks={false}
+          redirectTo={`${location.origin}/auth/callback`}
+          magicLink
+        />
+      </div>
     </div>
   );
 }
