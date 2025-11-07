@@ -1,7 +1,7 @@
 "use client";
-import AuthGate from "@/components/AuthGate";
-import CategoryFilter from "@/components/CategoryFilter";
-import FilmCard, { Film } from "@/components/FilmCard";
+import AuthGate from "../components/AuthGate";
+import CategoryFilter from "../components/CategoryFilter";
+import FilmCard, { Film } from "../components/FilmCard";
 import { useMemo, useState } from "react";
 
 /** TODO
