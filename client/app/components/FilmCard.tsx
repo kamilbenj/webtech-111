@@ -6,9 +6,10 @@ export type Film = {
   id: number
   title: string
   year: string
-  poster_url: string
+  poster_url?: string
   created_by: string
   created_at: string
+  commentaire?: string
   profiles?: {
     display_name?: string
     avatar_url?: string
@@ -58,21 +59,43 @@ export default function FilmCard({ film }: Props) {
 
       {/* 🖼️ Image + contenu */}
       <div className="flex flex-col md:flex-row">
-        {film.poster_url && (
-          <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
+        {/* Image du film */}
+        <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
+          {film.poster_url ? (
             <Image
               src={film.poster_url}
               alt={film.title}
               fill
               className="object-cover"
             />
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xl">
+              Pas d'image
+            </div>
+          )}
+        </div>
 
+        {/* Contenu du film */}
         <div className="flex-1 px-6 py-5 flex flex-col justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{film.title}</h2>
-            <p className="text-sm text-gray-500 mb-2">{film.year}</p>
+            <p className="text-sm text-gray-500 mb-4">{film.year}</p>
+
+            {/* 💬 Avis */}
+            <div className="mt-4">
+              <h3 className="font-semibold text-gray-800 mb-2">Avis :</h3>
+              {film.commentaire && film.commentaire.trim() !== '' ? (
+                <p className="text-sm text-gray-700 leading-relaxed">{film.commentaire}</p>
+              ) : (
+                <p className="text-sm text-gray-500 italic">Aucun avis pour ce film.</p>
+              )}
+            </div>
+
+            {/* 🗨️ Commentaires */}
+            <div className="mt-6 border-t pt-4">
+              <h4 className="font-semibold text-gray-800 mb-2">Commentaires :</h4>
+              <p className="text-sm text-gray-500 italic">Aucun commentaire pour le moment...</p>
+            </div>
           </div>
         </div>
       </div>
