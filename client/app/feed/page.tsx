@@ -1,42 +1,72 @@
 "use client";
+
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import AuthGate from "../components/AuthGate";
 import CategoryFilter from "../components/CategoryFilter";
 import FilmCard, { Film } from "../components/FilmCard";
-import { useMemo, useState } from "react";
-
-/** TODO
- * - Remplacer MOCK_FEED par un fetch Supabase (table: posts/reviews + films + friendships)
- * - Filtrer par "amis" côté SQL (via table friendships) ou côté client après SELECT
- */
-const MOCK_FEED: Film[] = [
-  { id:"1", title:"Inception", category:"Sci-Fi", rating:5, author:"Alice", reviewSnippet:"Mindblowing visuals." },
-  { id:"2", title:"Whiplash", category:"Drama", rating:4, author:"Bob", reviewSnippet:"Intense and precise." },
-  { id:"3", title:"Superbad", category:"Comedy", rating:3, author:"Claire", reviewSnippet:"Goofy, fun." },
-];
 
 export default function FeedPage() {
+  const [films, setFilms] = useState<Film[]>([]);
   const [cat, setCat] = useState("All");
-  const films = useMemo(
-    () => cat==="All" ? MOCK_FEED : MOCK_FEED.filter(f=>f.category===cat),
-    [cat]
-  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFilms = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("films")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Erreur lors du chargement des films :", error.message);
+      } else {
+        setFilms(data || []);
+      }
+
+      setLoading(false);
+    };
+
+    fetchFilms();
+  }, []);
+
+  // Filtrage si tu veux plus tard catégoriser (par ex. par année ou type)
+  const filteredFilms = useMemo(() => {
+    if (cat === "All") return films;
+    return films.filter((f) => f.year === cat);
+  }, [cat, films]);
 
   return (
     <AuthGate>
-      <section className="space-y-4">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Ton feed</h1>
-        </header>
+      <section className="min-h-screen bg-gradient-to-b from-orange-50 to-yellow-50 py-10 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <header className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h1 className="text-3xl font-extrabold text-gray-800">
+              🎥 Ton Feed
+            </h1>
+            <CategoryFilter selected={cat} onChange={setCat} />
+          </header>
 
-        <CategoryFilter selected={cat} onChange={setCat} />
+          {loading ? (
+            <div className="text-center text-gray-500 py-10">
+              Chargement des films...
+            </div>
+          ) : filteredFilms.length === 0 ? (
+            <div className="text-center text-gray-500 py-10">
+              Aucun film trouvé pour cette catégorie.
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-8">
+              {filteredFilms.map((film) => (
+                <FilmCard key={film.id} film={film} />
+              ))}
+            </div>
+          )}
 
-        <div className="grid gap-3">
-          {films.map(f => <FilmCard key={f.id} film={f} />)}
-        </div>
-
-        {/* Placeholders d’évolution */}
-        <div className="text-sm text-neutral-500">
-          À faire : “amis”, ajout de film, page détail /film/[id], likes/commentaires, upload poster.
+          <footer className="text-sm text-neutral-500 text-center pt-10 border-t border-gray-200">
+            À venir : système d’amis, likes, commentaires et pages de détails 🎬
+          </footer>
         </div>
       </section>
     </AuthGate>
