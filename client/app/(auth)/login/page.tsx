@@ -16,6 +16,7 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) setError(error.message)
@@ -23,8 +24,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-orange-200 bg-opacity-90">
-      <div className="w-full max-w-md bg-white/90 border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
+    <div className="relative min-h-screen w-full flex items-center justify-center px-4">
+      {/* Fond orange transparent couvrant tout l'écran */}
+      <div className="fixed inset-0 bg-orange-200/90 z-0"></div>
+
+      {/* Formulaire centré */}
+      <div className="relative z-10 w-full max-w-md bg-white border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
           Se connecter
         </h1>

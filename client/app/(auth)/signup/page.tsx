@@ -23,8 +23,12 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-50 to-yellow-50 px-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-2xl p-8">
+    <div className="relative min-h-screen w-full flex items-center justify-center px-4">
+      {/* Fond orange transparent */}
+      <div className="fixed inset-0 bg-orange-200/90 z-0"></div>
+
+      {/* Formulaire centré */}
+      <div className="relative z-10 w-full max-w-md bg-white border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
         {/* --- Titre --- */}
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
           Créer un compte
