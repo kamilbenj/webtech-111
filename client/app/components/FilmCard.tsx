@@ -22,6 +22,7 @@ type Props = {
 export default function FilmCard({ film }: Props) {
   return (
     <article className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden w-full max-w-5xl mx-auto">
+      {/* 🧑‍🎬 En-tête utilisateur */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
         <div className="flex items-center space-x-3">
           {film.profiles?.avatar_url ? (
@@ -41,14 +42,24 @@ export default function FilmCard({ film }: Props) {
             <p className="font-semibold text-gray-800 text-sm">
               {film.profiles?.display_name || 'Utilisateur'}
             </p>
-            <p className="text-gray-500 text-xs">{new Date(film.created_at).toLocaleDateString()}</p>
+            <p className="text-gray-500 text-xs">
+              {new Date(film.created_at).toLocaleDateString()}
+            </p>
           </div>
+        </div>
+
+        {/* Boutons d’action */}
+        <div className="flex items-center space-x-4 text-gray-500">
+          <button className="hover:text-gray-700 transition" title="Commenter">💬</button>
+          <button className="hover:text-gray-700 transition" title="Enregistrer">💾</button>
+          <button className="hover:text-gray-700 transition" title="Partager">🔁</button>
         </div>
       </div>
 
+      {/* 🖼️ Image + contenu */}
       <div className="flex flex-col md:flex-row">
         {film.poster_url && (
-          <div className="relative w-full md:w-1/3 h-[400px] border-r border-gray-100">
+          <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
             <Image
               src={film.poster_url}
               alt={film.title}
