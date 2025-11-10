@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 
-export default function SignupPage() {
+export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,21 +16,19 @@ export default function SignupPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) setError(error.message)
     else router.replace('/feed')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-orange-50 to-yellow-50 px-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-2xl p-8">
-        {/* --- Titre --- */}
+    <div className="flex-grow flex items-center justify-center bg-gradient-to-b from-orange-100 via-orange-50 to-yellow-50">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md border border-orange-100 shadow-2xl rounded-2xl p-8">
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
-          Créer un compte
+          Se connecter
         </h1>
 
-        {/* --- Formulaire --- */}
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <input
@@ -63,18 +61,17 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full py-3 rounded-full text-white font-semibold bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 transition-all disabled:opacity-60"
           >
-            {loading ? 'Création…' : 'Créer mon compte'}
+            {loading ? 'Connexion…' : 'Connexion'}
           </button>
         </form>
 
-        {/* --- Lien de connexion --- */}
         <p className="text-sm text-center mt-5 text-gray-600">
-          Déjà inscrit ?{' '}
+          Pas de compte ?{' '}
           <Link
-            href="/login"
+            href="/signup"
             className="font-semibold bg-gradient-to-r from-orange-500 to-yellow-400 bg-clip-text text-transparent hover:from-orange-600 hover:to-yellow-500 transition"
           >
-            Se connecter
+            Créer un compte
           </Link>
         </p>
       </div>
