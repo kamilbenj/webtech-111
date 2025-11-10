@@ -9,6 +9,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen bg-neutral-50 text-neutral-900">
         <NavBar />
         <main className="max-w-4xl mx-auto p-4">{children}</main>
+        <Footer />
       </body>
     </html>
   );

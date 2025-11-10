@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { User } from 'lucide-react' 
+import { supabase } from '@/lib/supabaseClient'
+import UserMenu from './UserMenu'
 
 export default function NavBar() {
   const router = useRouter()
@@ -17,7 +17,6 @@ export default function NavBar() {
     { href: '/about', label: 'About' },
   ]
 
-  // 🧠 Vérifie l’état de connexion dès le montage
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -25,20 +24,17 @@ export default function NavBar() {
     }
     checkUser()
 
-    // ✅ écoute les changements de session pour mise à jour en live
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setLogged(!!session)
     })
 
-    return () => {
-      listener.subscription.unsubscribe()
-    }
+    return () => listener.subscription.unsubscribe()
   }, [])
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        {/* --- Logo / Titre --- */}
+        {/* Logo */}
         <Link
           href="/"
           className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text"
@@ -46,7 +42,7 @@ export default function NavBar() {
           CineVerse<span className="text-gray-800">.</span>
         </Link>
 
-        {/* --- Navigation --- */}
+        {/* Navigation */}
         {logged ? (
           <div className="flex items-center space-x-6">
             <nav className="hidden md:flex space-x-8">
@@ -61,14 +57,8 @@ export default function NavBar() {
               ))}
             </nav>
 
-            {/* --- Bouton rond profil --- */}
-            <button
-              onClick={() => router.push('/account')}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 shadow-md transition"
-              aria-label="Mon compte"
-            >
-              <User className="text-white w-5 h-5" />
-            </button>
+            {/* Bouton utilisateur + menu déroulant */}
+            <UserMenu />
           </div>
         ) : (
           <div className="flex items-center space-x-4">

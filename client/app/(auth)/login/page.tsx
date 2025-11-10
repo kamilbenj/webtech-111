@@ -23,8 +23,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-gradient-to-b from-orange-100 via-orange-50 to-yellow-50">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-md border border-orange-100 shadow-2xl rounded-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-orange-200 bg-opacity-90">
+      <div className="w-full max-w-md bg-white/90 border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
           Se connecter
         </h1>
