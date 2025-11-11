@@ -7,17 +7,16 @@ export type Review = {
   scenario: number
   music: number
   special_effects: number
-  opinion?: string
+  opinion: string
   created_at: string
+  films?: {
+    title?: string
+    year?: string
+    poster_url?: string
+  }
   profiles?: {
     display_name?: string
     avatar_url?: string
-  }
-  films?: {
-    id: number
-    title: string
-    year: string
-    poster_url: string
   }
 }
 
@@ -55,6 +54,12 @@ export default function FilmCard({ review }: Props) {
             </p>
           </div>
         </div>
+
+        <div className="flex items-center space-x-4 text-gray-500">
+          <button className="hover:text-gray-700 transition" title="Commenter">💬</button>
+          <button className="hover:text-gray-700 transition" title="Enregistrer">💾</button>
+          <button className="hover:text-gray-700 transition" title="Partager">🔁</button>
+        </div>
       </div>
 
       {/* 🖼️ Image + contenu */}
@@ -63,7 +68,7 @@ export default function FilmCard({ review }: Props) {
           <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
             <Image
               src={film.poster_url}
-              alt={film.title}
+              alt={film.title || 'Affiche du film'}
               fill
               className="object-cover"
             />
@@ -72,8 +77,8 @@ export default function FilmCard({ review }: Props) {
 
         <div className="flex-1 px-6 py-5 flex flex-col justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{film?.title}</h2>
-            <p className="text-sm text-gray-500 mb-2">{film?.year}</p>
+            <h2 className="text-2xl font-bold text-gray-900">{film?.title || 'Titre inconnu'}</h2>
+            <p className="text-sm text-gray-500 mb-2">{film?.year || 'Année inconnue'}</p>
 
             {/* Étoiles */}
             <div className="space-y-2 mb-4">
@@ -99,6 +104,12 @@ export default function FilmCard({ review }: Props) {
               ) : (
                 <p className="text-sm text-gray-500 italic">Aucun avis pour ce film.</p>
               )}
+            </div>
+
+            {/* Commentaires (à implémenter) */}
+            <div className="mt-6 border-t pt-4">
+              <h4 className="font-semibold text-gray-800 mb-2">Commentaires :</h4>
+              <p className="text-sm text-gray-500 italic">À implémenter</p>
             </div>
           </div>
         </div>
