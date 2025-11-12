@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient"; 
+import { supabase } from "@/lib/supabaseClient";
 
+// ✅ Types précis
 type Review = {
   id: number;
   film_id: number | null;
@@ -15,10 +16,22 @@ type Review = {
   poster_url?: string | null;
 };
 
+type Profile = {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  bio?: string | null;
+};
+
+type User = {
+  id: string;
+  email: string;
+};
+
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,25 +56,27 @@ export default function ProfilePage() {
         return;
       }
 
-      setUser(currentUser);
-      setEmail(currentUser.email || "");
+      setUser({
+        id: currentUser.id,
+        email: currentUser.email ?? "",
+      });
+      setEmail(currentUser.email ?? "");
 
-      // Récupère le profil
+      // 🔹 Récupération du profil utilisateur
       const { data: profilesData, error: profileError } = await supabase
-  .from("profiles")
-  .select("id, username, display_name, bio")
-  .eq("id", currentUser.id)
-  .single();
+        .from("profiles")
+        .select("id, username, display_name, bio")
+        .eq("id", currentUser.id)
+        .single();
 
-if (profileError && profileError.code !== "PGRST116") {
-  console.error("Erreur lors du chargement du profil :", profileError);
-} else {
-  setProfile(profilesData || null);
-  setPseudo(profilesData?.display_name || ""); // ✅ pseudo = display_name
-}
+      if (profileError && profileError.code !== "PGRST116") {
+        console.error("Erreur lors du chargement du profil :", profileError);
+      } else {
+        setProfile(profilesData || null);
+        setPseudo(profilesData?.display_name || "");
+      }
 
-
-      // Récupère les reviews de l'utilisateur 
+      // 🔹 Récupération des critiques de l'utilisateur
       const { data: reviewsData, error: reviewsError } = await supabase
         .from("reviews")
         .select(`
@@ -78,9 +93,9 @@ if (profileError && profileError.code !== "PGRST116") {
         .order("created_at", { ascending: false });
 
       if (reviewsError) {
-        console.error("Reviews fetch error:", reviewsError);
+        console.error("Erreur lors du chargement des critiques :", reviewsError);
       } else {
-        const mapped = (reviewsData || []).map((r: any) => ({
+        const mapped: Review[] = (reviewsData || []).map((r: any) => ({
           id: r.id,
           film_id: r.film_id,
           opinion: r.opinion,
@@ -98,14 +113,18 @@ if (profileError && profileError.code !== "PGRST116") {
     })();
   }, []);
 
-  // Mettre à jour le pseudo dans profiles
+  // 🔹 Mettre à jour le pseudo
   const handleUpdatePseudo = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
     setError(null);
 
-    const { data: { user: currentUser } = {}, error: userErr } = await supabase.auth.getUser();
+    const {
+      data: { user: currentUser },
+      error: userErr,
+    } = await supabase.auth.getUser();
+
     if (userErr || !currentUser) {
       setError("Utilisateur non connecté.");
       setSaving(false);
@@ -114,29 +133,28 @@ if (profileError && profileError.code !== "PGRST116") {
 
     if (profile) {
       const { error: updateError } = await supabase
-  .from("profiles")
-  .update({ display_name: pseudo }) // mise à jour du display_name
-  .eq("id", currentUser.id);
-
+        .from("profiles")
+        .update({ display_name: pseudo })
+        .eq("id", currentUser.id);
 
       if (updateError) {
         setError("Impossible de mettre à jour le pseudo.");
         console.error(updateError);
       } else {
-        setProfile({ ...profile,display_name : pseudo });
+        setProfile({ ...profile, display_name: pseudo });
         setMessage("Pseudo mis à jour.");
       }
     } else {
-      // create
       const { error: insertError } = await supabase
         .from("profiles")
-        .insert({ id: currentUser.id,display_name : pseudo })
+        .insert({ id: currentUser.id, display_name: pseudo })
         .select();
+
       if (insertError) {
         setError("Impossible de créer le profil.");
         console.error(insertError);
       } else {
-        setProfile({ id: currentUser.id, pseudo });
+        setProfile({ id: currentUser.id, username: null, display_name: pseudo });
         setMessage("Profil créé et pseudo enregistré.");
       }
     }
@@ -144,14 +162,14 @@ if (profileError && profileError.code !== "PGRST116") {
     setSaving(false);
   };
 
-  // Mettre à jour email / mot de passe 
+  // 🔹 Mettre à jour email / mot de passe
   const handleUpdateAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
     setError(null);
 
-    const updates: any = {};
+    const updates: { email?: string; password?: string } = {};
     if (email) updates.email = email;
     if (newPassword) updates.password = newPassword;
 
@@ -161,18 +179,24 @@ if (profileError && profileError.code !== "PGRST116") {
       return;
     }
 
-    const { data, error: authError } = await supabase.auth.updateUser(updates);
+    const { error: authError } = await supabase.auth.updateUser(updates);
 
     if (authError) {
       setError("Erreur lors de la mise à jour des identifiants.");
       console.error(authError);
     } else {
-      setMessage("Compte mis à jour. Un email de confirmation peut être envoyé si l'email a changé.");
+      setMessage(
+        "Compte mis à jour. Un email de confirmation peut être envoyé si l’adresse email a changé."
+      );
       const {
         data: { user: updatedUser },
       } = await supabase.auth.getUser();
-      setUser(updatedUser);
-      setEmail(updatedUser?.email || "");
+      setUser(
+        updatedUser
+          ? { id: updatedUser.id, email: updatedUser.email ?? "" }
+          : null
+      );
+      setEmail(updatedUser?.email ?? "");
     }
 
     setNewPassword("");
@@ -187,12 +211,16 @@ if (profileError && profileError.code !== "PGRST116") {
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-8">
         <h1 className="text-3xl font-bold mb-2">Mon profil</h1>
 
-        {/* infos de profil */}
+        {/* Infos de profil */}
         <div className="text-sm text-gray-600 mb-6">
           {profile ? (
             <>
-              <div><strong>Pseudo :</strong> {profile.display_name || "—"}</div>
-              <div><strong>Email :</strong> {user?.email || "—"}</div>
+              <div>
+                <strong>Pseudo :</strong> {profile.display_name || "—"}
+              </div>
+              <div>
+                <strong>Email :</strong> {user?.email || "—"}
+              </div>
             </>
           ) : (
             <>Aucune information de profil.</>
@@ -210,7 +238,10 @@ if (profileError && profileError.code !== "PGRST116") {
               className="flex-1 border rounded px-3 py-2"
               placeholder="Nouveau pseudo"
             />
-            <button disabled={saving} className="bg-orange-500 text-white px-4 py-2 rounded">
+            <button
+              disabled={saving}
+              className="bg-orange-500 text-white px-4 py-2 rounded"
+            >
               {saving ? "Enregistrement..." : "Enregistrer"}
             </button>
           </div>
@@ -218,7 +249,9 @@ if (profileError && profileError.code !== "PGRST116") {
 
         {/* Modifier email / mot de passe */}
         <form onSubmit={handleUpdateAuth} className="mb-6">
-          <label className="block font-medium">Modifier email / mot de passe</label>
+          <label className="block font-medium">
+            Modifier email / mot de passe
+          </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
             <input
               type="email"
@@ -236,7 +269,10 @@ if (profileError && profileError.code !== "PGRST116") {
             />
           </div>
           <div className="mt-2">
-            <button disabled={saving} className="bg-gray-800 text-white px-4 py-2 rounded">
+            <button
+              disabled={saving}
+              className="bg-gray-800 text-white px-4 py-2 rounded"
+            >
               {saving ? "Mise à jour..." : "Mettre à jour le compte"}
             </button>
           </div>
@@ -261,22 +297,39 @@ if (profileError && profileError.code !== "PGRST116") {
                     <img
                       src={r.poster_url}
                       alt={r.film_title ?? "poster"}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
                     />
                   ) : (
-                    <div className="text-xs text-gray-400">Pas d'affiche</div>
+                    <div className="text-xs text-gray-400">Pas d&apos;affiche</div>
                   )}
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold">
                     {r.film_title ?? `Film #${r.film_id ?? "?"}`}{" "}
-                    <span className="text-gray-500 text-sm">({r.created_at ? new Date(r.created_at).getFullYear() : "?"})</span>
+                    <span className="text-gray-500 text-sm">
+                      (
+                      {r.created_at
+                        ? new Date(r.created_at).getFullYear()
+                        : "?"}
+                      )
+                    </span>
                   </h3>
                   <p className="text-gray-700 mt-2">{r.opinion}</p>
                   <div className="text-sm text-gray-500 mt-2">
-                    Scénario : {r.scenario ?? "-"} / Musique : {r.music ?? "-"} / Effets spéciaux : {r.special_effects ?? "-"}
+                    Scénario : {r.scenario ?? "-"} / Musique :{" "}
+                    {r.music ?? "-"} / Effets spéciaux :{" "}
+                    {r.special_effects ?? "-"}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">Publié le {r.created_at ? new Date(r.created_at).toLocaleDateString() : "?"}</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Publié le{" "}
+                    {r.created_at
+                      ? new Date(r.created_at).toLocaleDateString()
+                      : "?"}
+                  </div>
                 </div>
               </article>
             ))}
