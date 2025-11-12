@@ -29,12 +29,10 @@ export default function SignupPage() {
 
       {/* Formulaire centré */}
       <div className="relative z-10 w-full max-w-md bg-white border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
-        {/* --- Titre --- */}
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
           Créer un compte
         </h1>
 
-        {/* --- Formulaire --- */}
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <input
@@ -71,7 +69,6 @@ export default function SignupPage() {
           </button>
         </form>
 
-        {/* --- Lien de connexion --- */}
         <p className="text-sm text-center mt-5 text-gray-600">
           Déjà inscrit ?{' '}
           <Link

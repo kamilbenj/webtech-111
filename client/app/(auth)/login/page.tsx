@@ -25,10 +25,10 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center px-4">
-      {/* Fond orange transparent couvrant tout l'écran */}
+      {/* Fond orange transparent*/}
       <div className="fixed inset-0 bg-orange-200/90 z-0"></div>
 
-      {/* Formulaire centré */}
+      {/* Formulaire*/}
       <div className="relative z-10 w-full max-w-md bg-white border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
         <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
           Se connecter

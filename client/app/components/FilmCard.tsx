@@ -29,7 +29,7 @@ export default function FilmCard({ review }: Props) {
 
   return (
     <article className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden w-full max-w-5xl mx-auto">
-      {/* 🧑‍🎬 En-tête utilisateur */}
+      {/* En-tête utilisateur */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
         <div className="flex items-center space-x-3">
           {review.profiles?.avatar_url ? (
@@ -62,7 +62,7 @@ export default function FilmCard({ review }: Props) {
         </div>
       </div>
 
-      {/* 🖼️ Image + contenu */}
+      {/* Image Film + contenu */}
       <div className="flex flex-col md:flex-row">
         {film?.poster_url && (
           <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
@@ -80,18 +80,18 @@ export default function FilmCard({ review }: Props) {
             <h2 className="text-2xl font-bold text-gray-900">{film?.title || 'Titre inconnu'}</h2>
             <p className="text-sm text-gray-500 mb-2">{film?.year || 'Année inconnue'}</p>
 
-            {/* Étoiles */}
+            {/* Etoiles */}
             <div className="space-y-2 mb-4">
               <div className="flex items-center space-x-2">
-                <p className="w-28 font-semibold text-sm text-gray-700">🎬 Scénario :</p>
+                <p className="w-28 font-semibold text-sm text-gray-700">Scénario :</p>
                 <StarRating rating={review.scenario || 0} />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="w-28 font-semibold text-sm text-gray-700">🎵 Musique :</p>
+                <p className="w-28 font-semibold text-sm text-gray-700">Musique :</p>
                 <StarRating rating={review.music || 0} />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="w-28 font-semibold text-sm text-gray-700">💥 Effets spéciaux :</p>
+                <p className="w-28 font-semibold text-sm text-gray-700">Effets spéciaux :</p>
                 <StarRating rating={review.special_effects || 0} />
               </div>
             </div>

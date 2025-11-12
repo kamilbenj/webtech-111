@@ -13,7 +13,7 @@ export default function FeedPage() {
     const fetchData = async () => {
       setLoading(true)
 
-      // 🔗 Récupération des reviews avec les films et les profils
+      // Recuperation Supabase
       const { data, error } = await supabase
         .from('reviews')
         .select(`
@@ -54,7 +54,7 @@ export default function FeedPage() {
       <section className="min-h-screen bg-gradient-to-b from-orange-50 to-yellow-50 py-10 px-4 md:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <header className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h1 className="text-3xl font-extrabold text-gray-800">🎬 Les Dernières Critiques</h1>
+            <h1 className="text-3xl font-extrabold text-gray-800">Les Dernières Critiques</h1>
           </header>
 
           {loading ? (
