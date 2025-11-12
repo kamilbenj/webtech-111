@@ -95,7 +95,8 @@ export default function ProfilePage() {
       if (reviewsError) {
         console.error("Erreur lors du chargement des critiques :", reviewsError);
       } else {
-        const mapped: Review[] = (reviewsData || []).map((r: any) => ({
+        const mapped: Review[] = (reviewsData || []).map((r: Record<string, any>) => ({
+
           id: r.id,
           film_id: r.film_id,
           opinion: r.opinion,
