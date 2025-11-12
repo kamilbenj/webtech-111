@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
+// ✅ Définition du type Film (issu de ta table "films")
+interface Film {
+  id: number;
+  title: string;
+  year?: number | null;
+}
+
 // Initialisation du client Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,11 +26,11 @@ export default function AddReviewPage() {
   const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Film[]>([]);
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedFilm, setSelectedFilm] = useState<any>(null);
+  const [selectedFilm, setSelectedFilm] = useState<Film | null>(null);
 
-  // Recherche automatique dans la table "films"
+  // 🔍 Recherche automatique dans la table "films"
   useEffect(() => {
     const fetchFilms = async () => {
       if (search.trim().length < 2) {
@@ -36,14 +43,17 @@ export default function AddReviewPage() {
         .select("id, title, year")
         .ilike("title", `%${search}%`);
 
-      if (!error && data) setResults(data);
+      if (!error && data) {
+        // ✅ Typage automatique en Film[]
+        setResults(data as Film[]);
+      }
     };
 
     fetchFilms();
   }, [search]);
 
-  // Soumission du formulaire
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 🧾 Soumission du formulaire
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
@@ -54,7 +64,7 @@ export default function AddReviewPage() {
       return;
     }
 
-    // Récupération de l’utilisateur connecté
+    // 🔐 Récupération de l’utilisateur connecté
     const {
       data: { user },
       error: userError,
@@ -66,7 +76,7 @@ export default function AddReviewPage() {
       return;
     }
 
-    // Insertion de la critique
+    // 🪶 Insertion de la critique
     const { error } = await supabase.from("reviews").insert([
       {
         film_id: selectedFilm.id,
@@ -83,7 +93,7 @@ export default function AddReviewPage() {
       console.error("Supabase error:", JSON.stringify(error, null, 2));
       setMessage("Erreur lors de la création de la critique.");
     } else {
-      setMessage("Critique publiée avec succès.");
+      setMessage("Critique publiée avec succès !");
       setTitle("");
       setOpinion("");
       setScenario(5);
@@ -106,7 +116,7 @@ export default function AddReviewPage() {
         onSubmit={handleSubmit}
         className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6"
       >
-        {/* Recherche de film existant */}
+        {/* 🔎 Recherche de film existant */}
         <div className="relative">
           <label className="block font-semibold mb-1">Titre du film</label>
           <input
@@ -145,7 +155,7 @@ export default function AddReviewPage() {
           )}
         </div>
 
-        {/* Champ Avis */}
+        {/* 💬 Champ Avis */}
         <div>
           <label className="block font-semibold mb-1">Avis</label>
           <textarea
@@ -158,7 +168,7 @@ export default function AddReviewPage() {
           />
         </div>
 
-        {/* Notes */}
+        {/* ⭐ Notes */}
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block font-semibold mb-1">Scénario</label>
