@@ -42,7 +42,7 @@ export default function UserMenu() {
         <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-50 animate-fadeIn">
           <button
             onClick={() => {
-              router.push('/account')
+              router.push('/profile')
               setOpen(false)
             }}
             className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 transition"
