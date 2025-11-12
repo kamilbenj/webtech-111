@@ -1,40 +1,143 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
 
 export default function SignupPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [displayName, setDisplayName] = useState('')
+  const [bio, setBio] = useState('')
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
+  // 🟠 Gérer le fichier image et la preview
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // 🧩 Soumission du formulaire
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signUp({ email, password })
-    setLoading(false)
-    if (error) setError(error.message)
-    else router.replace('/feed')
+    setLoading(true)
+
+    try {
+      // 1️⃣ Crée le compte utilisateur
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+      if (signUpError) throw signUpError
+
+      const user = signUpData?.user
+      if (!user) throw new Error("Impossible de récupérer l'utilisateur créé.")
+
+      // 2️⃣ Upload de l'avatar (si fourni)
+      let avatarUrl: string | null = null
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split('.').pop()
+        const filePath = `avatars/${user.id}.${fileExt}`
+
+        const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, avatarFile, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: avatarFile.type, // 👈 important
+        })
+        if (uploadError) throw uploadError
+
+        const { data: publicUrlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath)
+
+        avatarUrl = publicUrlData.publicUrl
+      }
+
+      // 3️⃣ Insertion du profil
+      const { error: profileError } = await supabase.from('profiles').insert([
+        {
+          id: user.id,
+          username: email.split('@')[0],
+          display_name: displayName,
+          bio: bio || null,
+          avatar_url: avatarUrl,
+        },
+      ])
+      if (profileError) throw profileError
+
+      // 4️⃣ Redirection
+      router.replace('/feed')
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center px-4">
-      {/* Fond orange transparent */}
+      {/* Fond orangé */}
       <div className="fixed inset-0 bg-orange-200/90 z-0"></div>
 
-      {/* Formulaire centré */}
       <div className="relative z-10 w-full max-w-md bg-white border border-orange-300 shadow-2xl rounded-2xl p-8 backdrop-blur-md">
-        <h1 className="text-3xl font-extrabold text-center mb-6 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
-          Créer un compte
+        <h1 className="text-3xl font-extrabold text-center mb-8 bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text">
+          Créer ton compte 🎬
         </h1>
 
+        {/* 🧑‍🎨 Avatar */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative">
+            {avatarPreview ? (
+              <Image
+                src={avatarPreview}
+                alt="Avatar Preview"
+                width={100}
+                height={100}
+                className="rounded-full object-cover border-4 border-orange-300 shadow-md"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-4xl text-gray-400 border-4 border-dashed border-gray-300">
+                📸
+              </div>
+            )}
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-0 right-0 bg-orange-500 hover:bg-orange-600 text-white rounded-full p-2 shadow cursor-pointer transition"
+              title="Choisir une image"
+            >
+              +
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+          </div>
+          <p className="text-sm text-gray-500 mt-2">Photo de profil</p>
+        </div>
+
+        {/* 🧾 Formulaire */}
         <form onSubmit={onSubmit} className="space-y-4">
+          {/* Email */}
           <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              * Adresse e-mail
+            </label>
             <input
               type="email"
               value={email}
@@ -45,7 +148,11 @@ export default function SignupPage() {
             />
           </div>
 
+          {/* Mot de passe */}
           <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              * Mot de passe
+            </label>
             <input
               type="password"
               value={password}
@@ -53,6 +160,35 @@ export default function SignupPage() {
               placeholder="Mot de passe"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none transition"
+            />
+          </div>
+
+          {/* Nom d’affichage */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              * Nom d’affichage
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Ton nom visible publiquement"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none transition"
+            />
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Bio
+            </label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Parle un peu de toi..."
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none transition resize-none"
             />
           </div>
 
