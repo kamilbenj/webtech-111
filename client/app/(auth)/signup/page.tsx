@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
+import type { AuthError, AuthResponse } from '@supabase/supabase-js'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -17,45 +18,46 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 🟠 Gérer le fichier image et la preview
+  // 🟠 Gestion du fichier image et de la preview
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
+    const file = e.target.files?.[0]
+    if (file) {
       setAvatarFile(file)
       setAvatarPreview(URL.createObjectURL(file))
     }
   }
 
   // 🧩 Soumission du formulaire
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     setLoading(true)
 
     try {
-      // 1️⃣ Crée le compte utilisateur
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // 1️⃣ Création du compte utilisateur
+      const { data: signUpData, error: signUpError }: AuthResponse = await supabase.auth.signUp({
         email,
         password,
       })
-      if (signUpError) throw signUpError
 
+      if (signUpError) throw signUpError
       const user = signUpData?.user
       if (!user) throw new Error("Impossible de récupérer l'utilisateur créé.")
 
-      // 2️⃣ Upload de l'avatar (si fourni)
+      // 2️⃣ Upload de l’avatar (si fourni)
       let avatarUrl: string | null = null
       if (avatarFile) {
         const fileExt = avatarFile.name.split('.').pop()
-        const filePath = `avatars/${user.id}.${fileExt}`
+        const filePath = `${user.id}/avatar_${Date.now()}.${fileExt}`
 
         const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, avatarFile, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: avatarFile.type, // 👈 important
-        })
+          .from('avatars')
+          .upload(filePath, avatarFile, {
+            cacheControl: '3600',
+            upsert: true,
+            contentType: avatarFile.type,
+          })
+
         if (uploadError) throw uploadError
 
         const { data: publicUrlData } = supabase.storage
@@ -65,7 +67,7 @@ export default function SignupPage() {
         avatarUrl = publicUrlData.publicUrl
       }
 
-      // 3️⃣ Insertion du profil
+      // 3️⃣ Insertion du profil utilisateur
       const { error: profileError } = await supabase.from('profiles').insert([
         {
           id: user.id,
@@ -75,13 +77,17 @@ export default function SignupPage() {
           avatar_url: avatarUrl,
         },
       ])
+
       if (profileError) throw profileError
 
       // 4️⃣ Redirection
       router.replace('/feed')
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setError(err.message)
+      const message =
+        (err as AuthError)?.message ||
+        (err instanceof Error ? err.message : 'Erreur inconnue')
+      setError(message)
     } finally {
       setLoading(false)
     }
