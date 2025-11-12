@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // Initialisation du client Supabase
@@ -10,7 +10,6 @@ const supabase = createClient(
 );
 
 export default function AddReviewPage() {
-  // États du formulaire
   const [title, setTitle] = useState("");
   const [opinion, setOpinion] = useState("");
   const [scenario, setScenario] = useState(5);
@@ -19,83 +18,58 @@ export default function AddReviewPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  //Formulaire
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
+  const [selectedFilm, setSelectedFilm] = useState<any>(null);
+
+  // Recherche automatique dans la table "films"
+  useEffect(() => {
+    const fetchFilms = async () => {
+      if (search.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("films")
+        .select("id, title, year")
+        .ilike("title", `%${search}%`);
+
+      if (!error && data) setResults(data);
+    };
+
+    fetchFilms();
+  }, [search]);
+
+  // Soumission du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
-    
-    if (!title.trim()) {
-      setMessage("❌ Merci d’indiquer le nom du film !");
+    if (!selectedFilm) {
+      setMessage("Veuillez sélectionner un film existant dans la base.");
       setLoading(false);
       return;
     }
 
-    //Récupération de l’utilisateur connecté
+    // Récupération de l’utilisateur connecté
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      setMessage("❌ Tu dois être connecté pour publier une critique !");
+      setMessage("Tu dois être connecté pour publier une critique.");
       setLoading(false);
       return;
     }
 
-    console.log("👤 Utilisateur connecté :", user);
-
-    //Recherche du film dans la table
-    const { data: existingFilms, error: filmError } = await supabase
-      .from("films")
-      .select("*")
-      .ilike("title", title.trim());
-
-    if (filmError) {
-      console.error("Erreur recherche film :", filmError);
-      setMessage("❌ Erreur lors de la vérification du film.");
-      setLoading(false);
-      return;
-    }
-
-    let filmId;
-
-    if (existingFilms && existingFilms.length > 0) {
-      
-      filmId = existingFilms[0].id;
-      console.log("🎬 Film déjà existant :", existingFilms[0].title);
-    } else {
-      
-      console.log("🎬 Film non trouvé, création...");
-      const { data: newFilm, error: newFilmError } = await supabase
-        .from("films")
-        .insert([
-          {
-            title: title.trim(),
-            year: new Date().getFullYear(), 
-            poster_url: "https://via.placeholder.com/300x450?text=" + title.trim(), 
-            created_at: new Date(),
-          },
-        ])
-        .select()
-        .single();
-
-      if (newFilmError || !newFilm) {
-        console.error("Erreur création film :", newFilmError);
-        setMessage("❌ Erreur lors de la création du film.");
-        setLoading(false);
-        return;
-      }
-
-      filmId = newFilm.id;
-      console.log(" Film créé avec succès :", newFilm.title);
-    }
-
-    //Insertion de la critique
+    // Insertion de la critique
     const { error } = await supabase.from("reviews").insert([
       {
-        film_id: filmId,
+        film_id: selectedFilm.id,
         author_id: user.id,
         opinion,
         scenario,
@@ -109,12 +83,14 @@ export default function AddReviewPage() {
       console.error("Supabase error:", JSON.stringify(error, null, 2));
       setMessage("Erreur lors de la création de la critique.");
     } else {
-      setMessage("Critique publiée avec succès !");
+      setMessage("Critique publiée avec succès.");
       setTitle("");
       setOpinion("");
       setScenario(5);
       setMusic(5);
       setSpecialEffects(5);
+      setSelectedFilm(null);
+      setSearch("");
     }
 
     setLoading(false);
@@ -128,20 +104,48 @@ export default function AddReviewPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-4"
+        className="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6"
       >
-        <div>
+        {/* Recherche de film existant */}
+        <div className="relative">
           <label className="block font-semibold mb-1">Titre du film</label>
           <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setTitle(e.target.value);
+              setSelectedFilm(null);
+            }}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            placeholder="Rechercher un film existant..."
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            placeholder="Ex : Interstellar"
             required
           />
+
+          {/* Résultats de recherche */}
+          {isFocused && results.length > 0 && (
+            <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg w-full z-50 max-h-60 overflow-y-auto">
+              {results.map((film) => (
+                <div
+                  key={film.id}
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition"
+                  onClick={() => {
+                    setTitle(film.title);
+                    setSearch(film.title);
+                    setSelectedFilm(film);
+                    setResults([]);
+                  }}
+                >
+                  {film.title} {film.year ? `(${film.year})` : ""}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Champ Avis */}
         <div>
           <label className="block font-semibold mb-1">Avis</label>
           <textarea
@@ -154,6 +158,7 @@ export default function AddReviewPage() {
           />
         </div>
 
+        {/* Notes */}
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block font-semibold mb-1">Scénario</label>
@@ -164,7 +169,7 @@ export default function AddReviewPage() {
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
-                  {n} 
+                  {n}
                 </option>
               ))}
             </select>
@@ -179,7 +184,7 @@ export default function AddReviewPage() {
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
-                  {n} 
+                  {n}
                 </option>
               ))}
             </select>
@@ -194,7 +199,7 @@ export default function AddReviewPage() {
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
-                  {n} 
+                  {n}
                 </option>
               ))}
             </select>
@@ -206,7 +211,7 @@ export default function AddReviewPage() {
           disabled={loading}
           className="w-full bg-orange-500 text-white font-semibold py-2 rounded-lg hover:bg-orange-600 transition-colors"
         >
-          {loading ? "Publication..." : "Publier "}
+          {loading ? "Publication en cours..." : "Publier"}
         </button>
 
         {message && (
