@@ -4,6 +4,7 @@ import Image from 'next/image'
 
 export type Review = {
   id: number
+  film_id: number 
   scenario: number
   music: number
   special_effects: number
