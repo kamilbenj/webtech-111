@@ -18,23 +18,23 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // 🟠 Gestion du fichier image et de la preview
+  // Gérer l’image de profil et la preview
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
       setAvatarFile(file)
       setAvatarPreview(URL.createObjectURL(file))
     }
   }
 
-  // 🧩 Soumission du formulaire
+  // Formulaire
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     setLoading(true)
 
     try {
-      // 1️⃣ Création du compte utilisateur
+      // Création du compte utilisateur
       const { data: signUpData, error: signUpError }: AuthResponse = await supabase.auth.signUp({
         email,
         password,
@@ -44,11 +44,22 @@ export default function SignupPage() {
       const user = signUpData?.user
       if (!user) throw new Error("Impossible de récupérer l'utilisateur créé.")
 
-      // 2️⃣ Upload de l’avatar (si fourni)
-      let avatarUrl: string | null = null
+      // Insertion du profil utilisateur de base (sans image)
+      const { error: profileError } = await supabase.from('profiles').insert([
+        {
+          id: user.id,
+          username: email.split('@')[0],
+          display_name: displayName,
+          bio: bio || null,
+          avatar_url: null, 
+        },
+      ])
+      if (profileError) throw profileError
+
+      // Upload de l’avatar
       if (avatarFile) {
         const fileExt = avatarFile.name.split('.').pop()
-        const filePath = `${user.id}/avatar_${Date.now()}.${fileExt}`
+        const filePath = `${user.id}.${fileExt}`
 
         const { error: uploadError } = await supabase.storage
           .from('avatars')
@@ -60,27 +71,21 @@ export default function SignupPage() {
 
         if (uploadError) throw uploadError
 
-        const { data: publicUrlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(filePath)
+        //Récupération de l’URL 
+        const { 
+          data: { publicUrl },
+        } = supabase.storage.from('avatars').getPublicUrl(filePath)
 
-        avatarUrl = publicUrlData.publicUrl
+        // Mise à jour du profil avec l’URL
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id)
+
+        if (updateError) throw updateError
       }
 
-      // 3️⃣ Insertion du profil utilisateur
-      const { error: profileError } = await supabase.from('profiles').insert([
-        {
-          id: user.id,
-          username: email.split('@')[0],
-          display_name: displayName,
-          bio: bio || null,
-          avatar_url: avatarUrl,
-        },
-      ])
-
-      if (profileError) throw profileError
-
-      // 4️⃣ Redirection
+      // Redirection
       router.replace('/feed')
     } catch (err) {
       console.error(err)
@@ -103,7 +108,7 @@ export default function SignupPage() {
           Créer ton compte 🎬
         </h1>
 
-        {/* 🧑‍🎨 Avatar */}
+        {/* Avatar */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
             {avatarPreview ? (
@@ -137,7 +142,7 @@ export default function SignupPage() {
           <p className="text-sm text-gray-500 mt-2">Photo de profil</p>
         </div>
 
-        {/* 🧾 Formulaire */}
+        {/* Formulaire */}
         <form onSubmit={onSubmit} className="space-y-4">
           {/* Email */}
           <div>
@@ -198,9 +203,7 @@ export default function SignupPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-red-600 text-sm font-medium text-center">{error}</p>
-          )}
+          {error && <p className="text-red-600 text-sm font-medium text-center">{error}</p>}
 
           <button
             type="submit"
