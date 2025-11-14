@@ -16,6 +16,11 @@ export default function FeedPage() {
   const [filmCategories, setFilmCategories] = useState<FilmCategory[]>([])
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
 
+  // filtres par notes
+  const [scenarioFilter, setScenarioFilter] = useState<number | null>(null)
+  const [musicFilter, setMusicFilter] = useState<number | null>(null)
+  const [specialEffectsFilter, setSpecialEffectsFilter] = useState<number | null>(null)
+
   // 1) Charger les catégories pour le select
   useEffect(() => {
     const loadCategories = async () => {
@@ -51,7 +56,7 @@ export default function FeedPage() {
     loadFilmCategories()
   }, [])
 
-  // 3) Charger les reviews + infos film / auteur (ta requête d’origine)
+  // 3) Charger les reviews + infos film / auteur
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
@@ -91,56 +96,136 @@ export default function FeedPage() {
     fetchData()
   }, [])
 
-  // 4) Appliquer le filtre de catégorie côté client
+  // 4) Appliquer les filtres (catégorie + notes) côté client
   const filteredReviews = useMemo(() => {
-    if (!selectedCategoryId) return reviews
+    let result = reviews
 
-    // Tous les film_id qui ont la catégorie sélectionnée
-    const matchingFilmIds = new Set(
-      filmCategories
-        .filter(fc => fc.category_id === selectedCategoryId)
-        .map(fc => fc.film_id)
-    )
+    // filtre par catégorie
+    if (selectedCategoryId) {
+      const matchingFilmIds = new Set(
+        filmCategories
+          .filter((fc) => fc.category_id === selectedCategoryId)
+          .map((fc) => fc.film_id)
+      )
 
-    return reviews.filter(r => matchingFilmIds.has(r.film_id))
-  }, [reviews, filmCategories, selectedCategoryId])
+      result = result.filter((r) => matchingFilmIds.has(r.film_id))
+    }
+
+    // filtre par notes
+    result = result.filter((r) => {
+      const scenarioOk =
+        scenarioFilter === null || r.scenario === scenarioFilter
+      const musicOk =
+        musicFilter === null || r.music === musicFilter
+      const specialOk =
+        specialEffectsFilter === null || r.special_effects === specialEffectsFilter
+
+      return scenarioOk && musicOk && specialOk
+    })
+
+    return result
+  }, [
+    reviews,
+    filmCategories,
+    selectedCategoryId,
+    scenarioFilter,
+    musicFilter,
+    specialEffectsFilter,
+  ])
 
   const headerTitle = useMemo(() => {
     if (!selectedCategoryId) return 'Les Dernières Critiques'
-    const cat = categories.find(c => c.id === selectedCategoryId)
+    const cat = categories.find((c) => c.id === selectedCategoryId)
     return cat ? `Critiques — ${cat.name}` : 'Les Dernières Critiques'
   }, [selectedCategoryId, categories])
+
+  // helper pour les options de notes
+  const renderRatingSelect = (
+    label: string,
+    value: number | null,
+    onChange: (v: number | null) => void,
+    id: string
+  ) => (
+    <div className="flex items-center gap-2">
+      <label htmlFor={id} className="text-sm text-gray-600">
+        {label}
+      </label>
+      <select
+        id={id}
+        className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
+        value={value ?? ''}
+        onChange={(e) =>
+          onChange(e.target.value === '' ? null : Number(e.target.value))
+        }
+      >
+        <option value="">Toutes</option>
+        <option value={1}>1 ★</option>
+        <option value={2}>2 ★</option>
+        <option value={3}>3 ★</option>
+        <option value={4}>4 ★</option>
+        <option value={5}>5 ★</option>
+      </select>
+    </div>
+  )
 
   return (
     <AuthGate>
       <section className="min-h-screen bg-gradient-to-b from-orange-50 to-yellow-50 py-10 px-4 md:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          <header className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h1 className="text-3xl font-extrabold text-gray-800">
-              {headerTitle}
-            </h1>
+          <header className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <h1 className="text-3xl font-extrabold text-gray-800">
+                {headerTitle}
+              </h1>
 
-            <div className="flex items-center gap-2">
-              <label htmlFor="category" className="text-sm text-gray-600">
-                Filtrer par catégorie
-              </label>
-              <select
-                id="category"
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
-                value={selectedCategoryId ?? ''}
-                onChange={(e) =>
-                  setSelectedCategoryId(
-                    e.target.value === '' ? null : Number(e.target.value)
-                  )
-                }
-              >
-                <option value="">Toutes</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              {/* Filtre catégorie */}
+              <div className="flex items-center gap-2">
+                <label htmlFor="category" className="text-sm text-gray-600">
+                  Filtrer par catégorie
+                </label>
+                <select
+                  id="category"
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                  value={selectedCategoryId ?? ''}
+                  onChange={(e) =>
+                    setSelectedCategoryId(
+                      e.target.value === '' ? null : Number(e.target.value)
+                    )
+                  }
+                >
+                  <option value="">Toutes</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Filtres par notes */}
+            <div className="flex flex-wrap gap-4 items-center">
+              <span className="text-sm font-semibold text-gray-700">
+                Filtrer par notes :
+              </span>
+              {renderRatingSelect(
+                'Scénario',
+                scenarioFilter,
+                setScenarioFilter,
+                'scenario-rating'
+              )}
+              {renderRatingSelect(
+                'Musique',
+                musicFilter,
+                setMusicFilter,
+                'music-rating'
+              )}
+              {renderRatingSelect(
+                'Effets spéciaux',
+                specialEffectsFilter,
+                setSpecialEffectsFilter,
+                'fx-rating'
+              )}
             </div>
           </header>
 
