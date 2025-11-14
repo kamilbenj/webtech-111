@@ -21,6 +21,10 @@ export default function FeedPage() {
   const [musicFilter, setMusicFilter] = useState<number | null>(null)
   const [specialEffectsFilter, setSpecialEffectsFilter] = useState<number | null>(null)
 
+  // filtres par années
+  const [minYear, setMinYear] = useState<number | null>(null)
+  const [maxYear, setMaxYear] = useState<number | null>(null)
+
   // 1) Charger les catégories pour le select
   useEffect(() => {
     const loadCategories = async () => {
@@ -96,7 +100,7 @@ export default function FeedPage() {
     fetchData()
   }, [])
 
-  // 4) Appliquer les filtres (catégorie + notes) côté client
+  // 4) Appliquer tous les filtres côté client (catégorie + notes + années)
   const filteredReviews = useMemo(() => {
     let result = reviews
 
@@ -111,7 +115,7 @@ export default function FeedPage() {
       result = result.filter((r) => matchingFilmIds.has(r.film_id))
     }
 
-    // filtre par notes
+    // filtres par notes
     result = result.filter((r) => {
       const scenarioOk =
         scenarioFilter === null || r.scenario === scenarioFilter
@@ -123,6 +127,22 @@ export default function FeedPage() {
       return scenarioOk && musicOk && specialOk
     })
 
+    // filtres par année (on utilise films.year)
+    result = result.filter((r) => {
+      const rawYear = r.films?.year
+      const filmYear = rawYear ? Number(rawYear) : null
+
+      // si le film n'a pas d'année, on le filtre si un filtre est appliqué
+      if (filmYear === null && (minYear !== null || maxYear !== null)) {
+        return false
+      }
+
+      const minOk = minYear === null || (filmYear !== null && filmYear >= minYear)
+      const maxOk = maxYear === null || (filmYear !== null && filmYear <= maxYear)
+
+      return minOk && maxOk
+    })
+
     return result
   }, [
     reviews,
@@ -131,6 +151,8 @@ export default function FeedPage() {
     scenarioFilter,
     musicFilter,
     specialEffectsFilter,
+    minYear,
+    maxYear,
   ])
 
   const headerTitle = useMemo(() => {
@@ -139,7 +161,7 @@ export default function FeedPage() {
     return cat ? `Critiques — ${cat.name}` : 'Les Dernières Critiques'
   }, [selectedCategoryId, categories])
 
-  // helper pour les options de notes
+  // helper pour le select des notes
   const renderRatingSelect = (
     label: string,
     value: number | null,
@@ -226,6 +248,47 @@ export default function FeedPage() {
                 setSpecialEffectsFilter,
                 'fx-rating'
               )}
+            </div>
+
+            {/* Filtres par années */}
+            <div className="flex flex-wrap gap-4 items-center">
+              <span className="text-sm font-semibold text-gray-700">
+                Filtrer par année :
+              </span>
+              <div className="flex items-center gap-2">
+                <label htmlFor="min-year" className="text-sm text-gray-600">
+                  De
+                </label>
+                <input
+                  id="min-year"
+                  type="number"
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
+                  placeholder="1990"
+                  value={minYear ?? ''}
+                  onChange={(e) =>
+                    setMinYear(
+                      e.target.value === '' ? null : Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label htmlFor="max-year" className="text-sm text-gray-600">
+                  À
+                </label>
+                <input
+                  id="max-year"
+                  type="number"
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
+                  placeholder="2024"
+                  value={maxYear ?? ''}
+                  onChange={(e) =>
+                    setMaxYear(
+                      e.target.value === '' ? null : Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
             </div>
           </header>
 
