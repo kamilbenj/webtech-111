@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-// ✅ Types précis
 type Review = {
   id: number;
   film_id: number | null;
@@ -21,6 +20,7 @@ type Profile = {
   username: string | null;
   display_name: string | null;
   bio?: string | null;
+  avatar_url?: string | null;
 };
 
 type User = {
@@ -36,11 +36,15 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Form states for editing
   const [pseudo, setPseudo] = useState("");
+  const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // 🔸 Image states
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -56,16 +60,13 @@ export default function ProfilePage() {
         return;
       }
 
-      setUser({
-        id: currentUser.id,
-        email: currentUser.email ?? "",
-      });
+      setUser({ id: currentUser.id, email: currentUser.email ?? "" });
       setEmail(currentUser.email ?? "");
 
-      // 🔹 Récupération du profil utilisateur
+      // Profil
       const { data: profilesData, error: profileError } = await supabase
         .from("profiles")
-        .select("id, username, display_name, bio")
+        .select("id, username, display_name, bio, avatar_url")
         .eq("id", currentUser.id)
         .single();
 
@@ -74,9 +75,11 @@ export default function ProfilePage() {
       } else {
         setProfile(profilesData || null);
         setPseudo(profilesData?.display_name || "");
+        setBio(profilesData?.bio || "");
+        setAvatarPreview(profilesData?.avatar_url || null);
       }
 
-      // 🔹 Récupération des critiques de l'utilisateur
+      // Critiques
       const { data: reviewsData, error: reviewsError } = await supabase
         .from("reviews")
         .select(`
@@ -92,11 +95,8 @@ export default function ProfilePage() {
         .eq("author_id", currentUser.id)
         .order("created_at", { ascending: false });
 
-      if (reviewsError) {
-        console.error("Erreur lors du chargement des critiques :", reviewsError);
-      } else {
-        const mapped: Review[] = (reviewsData || []).map((r: Record<string, any>) => ({
-
+      if (!reviewsError && reviewsData) {
+        const mapped: Review[] = reviewsData.map((r: any) => ({
           id: r.id,
           film_id: r.film_id,
           opinion: r.opinion,
@@ -114,50 +114,78 @@ export default function ProfilePage() {
     })();
   }, []);
 
-  // 🔹 Mettre à jour le pseudo
-  const handleUpdatePseudo = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 🔹 Gérer le changement d'image
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // 🔹 Upload et mise à jour de l'image
+  const handleAvatarUpload = async () => {
+    if (!avatarFile || !user) return;
+
     setSaving(true);
     setMessage(null);
     setError(null);
 
-    const {
-      data: { user: currentUser },
-      error: userErr,
-    } = await supabase.auth.getUser();
+    try {
+      const fileExt = avatarFile.name.split(".").pop();
+      const filePath = `${user.id}.${fileExt}`;
 
-    if (userErr || !currentUser) {
-      setError("Utilisateur non connecté.");
-      setSaving(false);
-      return;
-    }
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, avatarFile, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: avatarFile.type,
+        });
 
-    if (profile) {
+      if (uploadError) throw uploadError;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({ display_name: pseudo })
-        .eq("id", currentUser.id);
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id);
 
-      if (updateError) {
-        setError("Impossible de mettre à jour le pseudo.");
-        console.error(updateError);
-      } else {
-        setProfile({ ...profile, display_name: pseudo });
-        setMessage("Pseudo mis à jour.");
-      }
+      if (updateError) throw updateError;
+
+      setProfile((p) => (p ? { ...p, avatar_url: publicUrl } : null));
+      setMessage("✅ Photo de profil mise à jour !");
+    } catch (err) {
+      console.error(err);
+      setError("Erreur lors du téléchargement de l'image.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 🔹 Mettre à jour pseudo + bio
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ display_name: pseudo, bio })
+      .eq("id", user.id);
+
+    if (updateError) {
+      setError("Impossible de mettre à jour le profil.");
+      console.error(updateError);
     } else {
-      const { error: insertError } = await supabase
-        .from("profiles")
-        .insert({ id: currentUser.id, display_name: pseudo })
-        .select();
-
-      if (insertError) {
-        setError("Impossible de créer le profil.");
-        console.error(insertError);
-      } else {
-        setProfile({ id: currentUser.id, username: null, display_name: pseudo });
-        setMessage("Profil créé et pseudo enregistré.");
-      }
+      setMessage("Profil mis à jour !");
+      setProfile((p) => (p ? { ...p, display_name: pseudo, bio } : null));
     }
 
     setSaving(false);
@@ -174,21 +202,11 @@ export default function ProfilePage() {
     if (email) updates.email = email;
     if (newPassword) updates.password = newPassword;
 
-    if (!updates.email && !updates.password) {
-      setError("Rien à mettre à jour.");
-      setSaving(false);
-      return;
-    }
-
     const { error: authError } = await supabase.auth.updateUser(updates);
-
     if (authError) {
       setError("Erreur lors de la mise à jour des identifiants.");
-      console.error(authError);
     } else {
-      setMessage(
-        "Compte mis à jour. Un email de confirmation peut être envoyé si l’adresse email a changé."
-      );
+      setMessage("Compte mis à jour !");
       const {
         data: { user: updatedUser },
       } = await supabase.auth.getUser();
@@ -197,7 +215,6 @@ export default function ProfilePage() {
           ? { id: updatedUser.id, email: updatedUser.email ?? "" }
           : null
       );
-      setEmail(updatedUser?.email ?? "");
     }
 
     setNewPassword("");
@@ -210,42 +227,76 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-8">
-        <h1 className="text-3xl font-bold mb-2">Mon profil</h1>
+        <h1 className="text-3xl font-bold mb-4">Mon profil</h1>
 
-        {/* Infos de profil */}
-        <div className="text-sm text-gray-600 mb-6">
-          {profile ? (
-            <>
-              <div>
-                <strong>Pseudo :</strong> {profile.display_name || "—"}
+        {/* Avatar */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative">
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Avatar Preview"
+                className="w-28 h-28 rounded-full object-cover border-4 border-orange-300 shadow-md"
+              />
+            ) : (
+              <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center text-4xl text-gray-400 border-4 border-dashed border-gray-300">
+                📸
               </div>
-              <div>
-                <strong>Email :</strong> {user?.email || "—"}
-              </div>
-            </>
-          ) : (
-            <>Aucune information de profil.</>
-          )}
+            )}
+
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-0 right-0 bg-orange-500 hover:bg-orange-600 text-white rounded-full p-2 shadow cursor-pointer transition"
+              title="Choisir une image"
+            >
+              +
+            </label>
+
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+          </div>
+
+          <button
+            onClick={handleAvatarUpload}
+            disabled={saving}
+            className="mt-3 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm"
+          >
+            {saving ? "Envoi..." : "Mettre à jour la photo"}
+          </button>
+
+          <p className="text-sm text-gray-500 mt-2">Photo de profil</p>
         </div>
 
-        {/* Modifier pseudo */}
-        <form onSubmit={handleUpdatePseudo} className="mb-6">
-          <label className="block font-medium">Modifier le pseudo</label>
-          <div className="flex gap-2 mt-2">
-            <input
-              type="text"
-              value={pseudo}
-              onChange={(e) => setPseudo(e.target.value)}
-              className="flex-1 border rounded px-3 py-2"
-              placeholder="Nouveau pseudo"
-            />
-            <button
-              disabled={saving}
-              className="bg-orange-500 text-white px-4 py-2 rounded"
-            >
-              {saving ? "Enregistrement..." : "Enregistrer"}
-            </button>
-          </div>
+      
+
+        {/* Modifier pseudo et bio */}
+        <form onSubmit={handleUpdateProfile} className="mb-6 space-y-3">
+          <label className="block font-medium">Pseudo & bio</label>
+          <input
+            type="text"
+            value={pseudo}
+            onChange={(e) => setPseudo(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            placeholder="Ton pseudo"
+          />
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={3}
+            className="w-full border rounded px-3 py-2"
+            placeholder="Ta bio..."
+          />
+          <button
+            disabled={saving}
+            className="bg-orange-500 text-white px-4 py-2 rounded"
+          >
+            {saving ? "Sauvegarde..." : "Mettre à jour le profil"}
+          </button>
         </form>
 
         {/* Modifier email / mot de passe */}
@@ -266,17 +317,15 @@ export default function ProfilePage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="border rounded px-3 py-2"
-              placeholder="Nouveau mot de passe (laisser vide si pas de changement)"
+              placeholder="Nouveau mot de passe"
             />
           </div>
-          <div className="mt-2">
-            <button
-              disabled={saving}
-              className="bg-gray-800 text-white px-4 py-2 rounded"
-            >
-              {saving ? "Mise à jour..." : "Mettre à jour le compte"}
-            </button>
-          </div>
+          <button
+            disabled={saving}
+            className="mt-2 bg-gray-800 text-white px-4 py-2 rounded"
+          >
+            {saving ? "Mise à jour..." : "Mettre à jour le compte"}
+          </button>
         </form>
 
         {message && <div className="text-green-600 mb-4">{message}</div>}
@@ -286,7 +335,6 @@ export default function ProfilePage() {
 
         {/* Mes critiques */}
         <h2 className="text-2xl font-semibold mb-4">Mes critiques</h2>
-
         {reviews.length === 0 ? (
           <div className="text-gray-500">Aucune critique publiée.</div>
         ) : (
@@ -298,38 +346,25 @@ export default function ProfilePage() {
                     <img
                       src={r.poster_url}
                       alt={r.film_title ?? "poster"}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="text-xs text-gray-400">Pas d&apos;affiche</div>
+                    <div className="text-xs text-gray-400">Pas d’affiche</div>
                   )}
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold">
                     {r.film_title ?? `Film #${r.film_id ?? "?"}`}{" "}
                     <span className="text-gray-500 text-sm">
-                      (
-                      {r.created_at
+                      ({r.created_at
                         ? new Date(r.created_at).getFullYear()
-                        : "?"}
-                      )
+                        : "?"})
                     </span>
                   </h3>
                   <p className="text-gray-700 mt-2">{r.opinion}</p>
                   <div className="text-sm text-gray-500 mt-2">
-                    Scénario : {r.scenario ?? "-"} / Musique :{" "}
-                    {r.music ?? "-"} / Effets spéciaux :{" "}
-                    {r.special_effects ?? "-"}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Publié le{" "}
-                    {r.created_at
-                      ? new Date(r.created_at).toLocaleDateString()
-                      : "?"}
+                    Scénario : {r.scenario ?? "-"} / Musique : {r.music ?? "-"} /
+                    Effets spéciaux : {r.special_effects ?? "-"}
                   </div>
                 </div>
               </article>
