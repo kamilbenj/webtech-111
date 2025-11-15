@@ -34,13 +34,15 @@ export default function FilmCard({ review }: Props) {
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
         <div className="flex items-center space-x-3">
           {review.profiles?.avatar_url ? (
-            <Image
-              src={review.profiles.avatar_url}
-              alt={review.profiles.display_name || 'Utilisateur'}
-              width={40}
-              height={40}
-              className="rounded-full object-cover"
-            />
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <Image
+                src={review.profiles.avatar_url}
+                alt={review.profiles.display_name || 'Utilisateur'}
+                width={40}
+                height={40}
+                className="object-cover"
+              />
+            </div>
           ) : (
             <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white text-sm font-semibold">
               🎬
@@ -66,12 +68,12 @@ export default function FilmCard({ review }: Props) {
       {/* Image Film + contenu */}
       <div className="flex flex-col md:flex-row">
         {film?.poster_url && (
-          <div className="relative w-full md:w-1/3 h-[500px] border-r border-gray-100">
+          <div className="relative w-full md:w-1/3 aspect-[500/700] border-r border-gray-100">
             <Image
               src={film.poster_url}
               alt={film.title || 'Affiche du film'}
               fill
-              className="object-cover"
+              className="object-contain"
             />
           </div>
         )}
