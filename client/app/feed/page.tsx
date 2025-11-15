@@ -75,17 +75,30 @@ export default function FeedPage() {
           special_effects,
           opinion,
           created_at,
+
           profiles:author_id (
             display_name,
             avatar_url
           ),
+
           films:film_id (
             title,
             year,
             poster_url
+          ),
+
+          review_comments (
+            id,
+            content,
+            created_at,
+            profiles:author_id (
+              display_name,
+              avatar_url
+            )
           )
         `)
         .order('created_at', { ascending: false })
+
 
       if (error) {
         console.error('Erreur chargement reviews :', error.message)
