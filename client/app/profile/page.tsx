@@ -21,6 +21,7 @@ type Profile = {
   display_name: string | null;
   bio?: string | null;
   avatar_url?: string | null;
+  is_private: boolean;
 };
 
 type User = {
@@ -40,6 +41,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // 🔸 Image states
@@ -66,7 +68,7 @@ export default function ProfilePage() {
       // Profil
       const { data: profilesData, error: profileError } = await supabase
         .from("profiles")
-        .select("id, username, display_name, bio, avatar_url")
+        .select("id, username, display_name, bio, avatar_url, is_private")
         .eq("id", currentUser.id)
         .single();
 
@@ -77,6 +79,7 @@ export default function ProfilePage() {
         setPseudo(profilesData?.display_name || "");
         setBio(profilesData?.bio || "");
         setAvatarPreview(profilesData?.avatar_url || null);
+        setIsPrivate(profilesData?.is_private ?? false); // 🔹 initialisation
       }
 
       // Critiques
@@ -114,7 +117,6 @@ export default function ProfilePage() {
     })();
   }, []);
 
-  // 🔹 Gérer le changement d'image
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -123,7 +125,6 @@ export default function ProfilePage() {
     }
   };
 
-  // 🔹 Upload et mise à jour de l'image
   const handleAvatarUpload = async () => {
     if (!avatarFile || !user) return;
 
@@ -166,7 +167,6 @@ export default function ProfilePage() {
     }
   };
 
-  // 🔹 Mettre à jour pseudo + bio
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -177,7 +177,7 @@ export default function ProfilePage() {
 
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ display_name: pseudo, bio })
+      .update({ display_name: pseudo, bio, is_private: isPrivate })
       .eq("id", user.id);
 
     if (updateError) {
@@ -185,13 +185,14 @@ export default function ProfilePage() {
       console.error(updateError);
     } else {
       setMessage("Profil mis à jour !");
-      setProfile((p) => (p ? { ...p, display_name: pseudo, bio } : null));
+      setProfile((p) =>
+        p ? { ...p, display_name: pseudo, bio, is_private: isPrivate } : null
+      );
     }
 
     setSaving(false);
   };
 
-  // 🔹 Mettre à jour email / mot de passe
   const handleUpdateAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -243,7 +244,6 @@ export default function ProfilePage() {
                 📸
               </div>
             )}
-
             <label
               htmlFor="avatar-upload"
               className="absolute bottom-0 right-0 bg-orange-500 hover:bg-orange-600 text-white rounded-full p-2 shadow cursor-pointer transition"
@@ -251,7 +251,6 @@ export default function ProfilePage() {
             >
               +
             </label>
-
             <input
               id="avatar-upload"
               type="file"
@@ -272,9 +271,7 @@ export default function ProfilePage() {
           <p className="text-sm text-gray-500 mt-2">Photo de profil</p>
         </div>
 
-      
-
-        {/* Modifier pseudo et bio */}
+        {/* Modifier pseudo, bio et type de compte */}
         <form onSubmit={handleUpdateProfile} className="mb-6 space-y-3">
           <label className="block font-medium">Pseudo & bio</label>
           <input
@@ -291,9 +288,36 @@ export default function ProfilePage() {
             className="w-full border rounded px-3 py-2"
             placeholder="Ta bio..."
           />
+
+          {/* Toggle Public / Privé */}
+          <div className="flex gap-2 mt-2">
+            <button
+              type="button"
+              onClick={() => setIsPrivate(false)}
+              className={`flex-1 py-2 rounded border ${
+                !isPrivate
+                  ? "bg-orange-500 text-white border-orange-500"
+                  : "bg-white text-gray-700 border-gray-300"
+              }`}
+            >
+              Public
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPrivate(true)}
+              className={`flex-1 py-2 rounded border ${
+                isPrivate
+                  ? "bg-orange-500 text-white border-orange-500"
+                  : "bg-white text-gray-700 border-gray-300"
+              }`}
+            >
+              Privé
+            </button>
+          </div>
+
           <button
             disabled={saving}
-            className="bg-orange-500 text-white px-4 py-2 rounded"
+            className="bg-orange-500 text-white px-4 py-2 rounded mt-3"
           >
             {saving ? "Sauvegarde..." : "Mettre à jour le profil"}
           </button>

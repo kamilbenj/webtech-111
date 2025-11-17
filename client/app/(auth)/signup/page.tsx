@@ -17,6 +17,9 @@ export default function SignupPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isPrivate, setIsPrivate] = useState(false) //public par défaut
+
+
 
   // Gérer l’image de profil et la preview
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +55,7 @@ export default function SignupPage() {
           display_name: displayName,
           bio: bio || null,
           avatar_url: null, 
+          is_private: isPrivate,
         },
       ])
       if (profileError) throw profileError
@@ -201,6 +205,37 @@ export default function SignupPage() {
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none transition resize-none"
             />
+          </div>
+
+          {/* Visibilité du profil */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Visibilité du profil
+            </label>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => setIsPrivate(false)}
+                className={`flex-1 py-2 rounded-xl font-semibold transition ${
+                  !isPrivate
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Public
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPrivate(true)}
+                className={`flex-1 py-2 rounded-xl font-semibold transition ${
+                  isPrivate
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Privé
+              </button>
+            </div>
           </div>
 
           {error && <p className="text-red-600 text-sm font-medium text-center">{error}</p>}
