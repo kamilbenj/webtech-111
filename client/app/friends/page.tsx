@@ -7,6 +7,7 @@ import Link from "next/link";
 type Profile = {
   id: string;
   display_name: string | null;
+  avatar_url?: string | null;
 };
 
 type PendingRequest = {
@@ -46,7 +47,7 @@ export default function FriendsPage() {
     if (friendIds.length > 0) {
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, avatar_url")
         .in("id", friendIds);
 
       setFriends(profiles || []);
@@ -61,7 +62,6 @@ export default function FriendsPage() {
       .eq("addressee_id", user.id)
       .eq("status", "pending");
 
-    // si on a déjà des amis, on retire leurs IDs du pending
     if (friendIds.length > 0) {
       friendIds.forEach((fid) => {
         pendingQuery = pendingQuery.neq("requester_id", fid);
@@ -108,7 +108,7 @@ export default function FriendsPage() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, avatar_url")
         .ilike("display_name", `%${search}%`)
         .limit(10);
 
@@ -162,7 +162,7 @@ export default function FriendsPage() {
 
     if (error) return alert("Erreur en acceptant.");
 
-    await loadData(); // 🔥 mise à jour instantanée !
+    await loadData();
   };
 
   /* -----------------------------------------------------
@@ -176,7 +176,7 @@ export default function FriendsPage() {
 
     if (error) return alert("Erreur en refusant.");
 
-    await loadData(); // mise à jour propre
+    await loadData();
   };
 
   /* ----------------------------------------------------- */
@@ -201,9 +201,16 @@ export default function FriendsPage() {
           {results.map((u) => (
             <div
               key={u.id}
-              className="flex justify-between items-center p-3 border-b last:border-none"
+              className="flex items-center justify-between p-3 border-b last:border-none"
             >
-              <span>{u.display_name}</span>
+              <div className="flex items-center gap-3">
+                <img
+                  src={u.avatar_url || "/default-avatar.png"}
+                  className="w-10 h-10 rounded-full object-cover border"
+                />
+                <span>{u.display_name}</span>
+              </div>
+
               <button
                 onClick={() => sendRequest(u.id)}
                 className="bg-blue-500 text-white px-3 py-1 rounded"
@@ -256,7 +263,15 @@ export default function FriendsPage() {
       ) : (
         <ul className="space-y-3">
           {friends.map((f) => (
-            <li key={f.id} className="border p-4 rounded-lg shadow">
+            <li
+              key={f.id}
+              className="border p-4 rounded-lg shadow flex items-center gap-4"
+            >
+              <img
+                src={f.avatar_url || "/default-avatar.png"}
+                className="w-12 h-12 rounded-full object-cover border"
+              />
+
               <Link href={`/friends/${f.id}`}>
                 <span className="font-semibold hover:underline cursor-pointer">
                   {f.display_name}

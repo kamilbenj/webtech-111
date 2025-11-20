@@ -66,24 +66,22 @@ export default function ProfilePage() {
       setEmail(currentUser.email ?? "");
 
       // Profil
-      const { data: profilesData, error: profileError } = await supabase
+      const { data: profilesData } = await supabase
         .from("profiles")
         .select("id, username, display_name, bio, avatar_url, is_private")
         .eq("id", currentUser.id)
         .single();
 
-      if (profileError && profileError.code !== "PGRST116") {
-        console.error("Erreur lors du chargement du profil :", profileError);
-      } else {
-        setProfile(profilesData || null);
-        setPseudo(profilesData?.display_name || "");
-        setBio(profilesData?.bio || "");
-        setAvatarPreview(profilesData?.avatar_url || null);
-        setIsPrivate(profilesData?.is_private ?? false); // 🔹 initialisation
+      if (profilesData) {
+        setProfile(profilesData);
+        setPseudo(profilesData.display_name || "");
+        setBio(profilesData.bio || "");
+        setAvatarPreview(profilesData.avatar_url || null);
+        setIsPrivate(profilesData.is_private ?? false);
       }
 
       // Critiques
-      const { data: reviewsData, error: reviewsError } = await supabase
+      const { data: reviewsData } = await supabase
         .from("reviews")
         .select(`
           id,
@@ -98,7 +96,7 @@ export default function ProfilePage() {
         .eq("author_id", currentUser.id)
         .order("created_at", { ascending: false });
 
-      if (!reviewsError && reviewsData) {
+      if (reviewsData) {
         const mapped: Review[] = reviewsData.map((r: any) => ({
           id: r.id,
           film_id: r.film_id,
@@ -134,12 +132,14 @@ export default function ProfilePage() {
 
     try {
       const fileExt = avatarFile.name.split(".").pop();
-      const filePath = `${user.id}.${fileExt}`;
+
+      // 🔥 Fichier unique pour éviter le cache Supabase
+      const filePath = `${user.id}-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, avatarFile, {
-          cacheControl: "3600",
+          cacheControl: "0",
           upsert: true,
           contentType: avatarFile.type,
         });
@@ -157,7 +157,10 @@ export default function ProfilePage() {
 
       if (updateError) throw updateError;
 
+      // 🔥 Met à jour immédiatement l'affichage
+      setAvatarPreview(publicUrl);
       setProfile((p) => (p ? { ...p, avatar_url: publicUrl } : null));
+
       setMessage("✅ Photo de profil mise à jour !");
     } catch (err) {
       console.error(err);
@@ -247,7 +250,6 @@ export default function ProfilePage() {
             <label
               htmlFor="avatar-upload"
               className="absolute bottom-0 right-0 bg-orange-500 hover:bg-orange-600 text-white rounded-full p-2 shadow cursor-pointer transition"
-              title="Choisir une image"
             >
               +
             </label>
@@ -271,7 +273,7 @@ export default function ProfilePage() {
           <p className="text-sm text-gray-500 mt-2">Photo de profil</p>
         </div>
 
-        {/* Modifier pseudo, bio et type de compte */}
+        {/* Pseudo, bio, privé/public */}
         <form onSubmit={handleUpdateProfile} className="mb-6 space-y-3">
           <label className="block font-medium">Pseudo & bio</label>
           <input
