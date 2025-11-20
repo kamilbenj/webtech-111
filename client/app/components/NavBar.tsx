@@ -13,7 +13,7 @@ export default function NavBar() {
   const links = [
     { href: '/', label: 'Discover' },
     { href: '/posts', label: 'Posts' },
-    { href: '/friends', label: 'Friends' },   
+    { href: '/friends', label: 'Friends' },
   ]
 
   useEffect(() => {
@@ -31,51 +31,90 @@ export default function NavBar() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white backdrop-blur-md shadow-sm border-b border-gray-200">
+    <header
+      className="
+      sticky top-0 z-50
+      bg-[var(--card-bg)]
+      border-b border-[var(--border-vintage)]
+      shadow-[0_3px_10px_rgba(60,50,40,0.15)]
+      backdrop-blur-sm
+      "
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        
-        {/* Logo */}
+
+        {/* --- LOGO Vintage --- */}
         <Link
           href="/"
-          className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-orange-500 to-yellow-400 text-transparent bg-clip-text"
+          className="
+            text-3xl font-bold tracking-wider 
+            title-vintage
+            text-[var(--foreground)]
+            hover:text-[var(--accent)]
+            transition
+          "
         >
-          CineVerse<span className="text-gray-800">.</span>
+          CineVerse<span className="opacity-70">.</span>
         </Link>
 
-        {/* Navigation */}
+        {/* --- NAVIGATION --- */}
         {logged ? (
           <div className="flex items-center space-x-6">
+
+            {/* LINKS */}
             <nav className="hidden md:flex space-x-8">
               {links.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="relative text-base text-gray-700 hover:text-transparent 
-                             hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400
-                             bg-clip-text font-medium transition"
+                  className="
+                    relative text-base font-medium
+                    text-[var(--foreground)]
+                    hover:text-[var(--accent)]
+                    transition
+                    after:absolute after:-bottom-1 after:left-0 
+                    after:w-full after:h-[2px]
+                    after:bg-[var(--accent)]
+                    after:scale-x-0 hover:after:scale-x-100
+                    after:transition-transform after:duration-300
+                    after:origin-left
+                  "
                 >
                   {label}
                 </Link>
               ))}
             </nav>
 
-            {/* Menu utilisateur */}
+            {/* --- USER MENU --- */}
             <UserMenu />
           </div>
         ) : (
           <div className="flex items-center space-x-4">
+
+            {/* LOGIN */}
             <Link
               href="/login"
-              className="text-sm font-semibold text-gray-700 hover:text-transparent 
-                         hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400 bg-clip-text transition"
+              className="
+                text-sm font-semibold 
+                text-[var(--foreground)]
+                hover:text-[var(--accent)]
+                transition
+              "
             >
               Login
             </Link>
+
+            {/* SIGNUP */}
             <Link
               href="/signup"
-              className="text-sm font-semibold px-4 py-2 rounded-full text-white 
-                         bg-gradient-to-r from-orange-500 to-yellow-400
-                         hover:from-orange-600 hover:to-yellow-500 transition"
+              className="
+                text-sm font-semibold px-4 py-2 rounded-full
+                bg-[var(--accent)]
+                text-white
+                border border-black/10
+                hover:bg-[var(--accent-light)]
+                transition
+                shadow-sm
+              "
             >
               Sign up
             </Link>
