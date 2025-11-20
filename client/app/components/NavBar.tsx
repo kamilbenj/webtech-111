@@ -13,9 +13,7 @@ export default function NavBar() {
   const links = [
     { href: '/', label: 'Discover' },
     { href: '/posts', label: 'Posts' },
-    { href: '/friends', label: 'Friends' },      // <-- ICI ajouté
-    { href: '/contact', label: 'Contact' },
-    { href: '/about', label: 'About' },
+    { href: '/friends', label: 'Friends' },   
   ]
 
   useEffect(() => {

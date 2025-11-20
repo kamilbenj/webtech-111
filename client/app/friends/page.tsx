@@ -23,16 +23,14 @@ export default function FriendsPage() {
   const [results, setResults] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* -----------------------------------------------------
-   * 🔄 Fonction centrale : charger amis + demandes
-   * ----------------------------------------------------- */
+  /* Fonction centrale : charger amis + demandes*/
   const loadData = async () => {
     const { data: userData, error: userErr } = await supabase.auth.getUser();
     if (userErr || !userData?.user) return;
 
     const user = userData.user;
 
-    /* ---------- A) Amis acceptés ---------- */
+    /*Amis acceptés */
     const { data: friendships } = await supabase
       .from("friendships")
       .select("*")
@@ -55,7 +53,7 @@ export default function FriendsPage() {
       setFriends([]);
     }
 
-    /* ---------- B) Demandes d'amis reçues ---------- */
+    /* Demandes d'amis reçues */
     let pendingQuery = supabase
       .from("friendships")
       .select("id, requester_id")
@@ -92,16 +90,12 @@ export default function FriendsPage() {
     }
   };
 
-  /* -----------------------------------------------------
-   * Charger au démarrage
-   * ----------------------------------------------------- */
+  /*  Charger au démarrage */
   useEffect(() => {
     loadData().then(() => setLoading(false));
   }, []);
 
-  /* -----------------------------------------------------
-   * 🔍 Recherche de profils
-   * ----------------------------------------------------- */
+  /*Recherche de profils */
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (search.trim().length < 2) return setResults([]);
@@ -119,9 +113,7 @@ export default function FriendsPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  /* -----------------------------------------------------
-   * ➕ Envoyer une demande
-   * ----------------------------------------------------- */
+  /*Envoyer une demande*/
   const sendRequest = async (target: string) => {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
@@ -151,9 +143,7 @@ export default function FriendsPage() {
     else alert("Demande envoyée !");
   };
 
-  /* -----------------------------------------------------
-   * ✔️ Accepter une demande → rafraîchissement auto !
-   * ----------------------------------------------------- */
+  /* Accepter une demande → rafraîchissement auto ! */
   const accept = async (id: string) => {
     const { error } = await supabase
       .from("friendships")
@@ -165,9 +155,7 @@ export default function FriendsPage() {
     await loadData();
   };
 
-  /* -----------------------------------------------------
-   * ❌ Refuser
-   * ----------------------------------------------------- */
+  /* Refuser */
   const decline = async (id: string) => {
     const { error } = await supabase
       .from("friendships")
@@ -179,7 +167,6 @@ export default function FriendsPage() {
     await loadData();
   };
 
-  /* ----------------------------------------------------- */
 
   if (loading) return <div className="p-6">Chargement…</div>;
 

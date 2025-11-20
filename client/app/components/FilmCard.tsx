@@ -49,13 +49,15 @@ export default function FilmCard({ review }: Props) {
   const [commentText, setCommentText] = useState("");
   const [sending, setSending] = useState(false);
 
-  // Envoi commentaire sans reload 
+  // 🔸 Envoi commentaire sans reload
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
 
     setSending(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
     const { data: newComment, error } = await supabase
@@ -65,22 +67,20 @@ export default function FilmCard({ review }: Props) {
         author_id: user.id,
         content: commentText.trim(),
       })
-      .select(`
+      .select(
+        `
         *,
         profiles:author_id (
           display_name,
           avatar_url
         )
-      `)
+      `
+      )
       .single();
 
-
     if (!error && newComment) {
-      // Ajoute le nouveau commentaire en haut
       setComments((prev) => [newComment, ...prev]);
       setCommentText("");
-    } else if (error) {
-      console.error(error);
     }
 
     setSending(false);
@@ -88,18 +88,17 @@ export default function FilmCard({ review }: Props) {
 
   return (
     <article className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow border overflow-hidden">
-
       {/* Header user */}
       <div className="flex items-center justify-between px-6 py-4 border-b bg-white">
         <div className="flex items-center space-x-3">
           {review.profiles?.avatar_url ? (
-            <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
               <Image
                 src={review.profiles.avatar_url}
                 alt={review.profiles.display_name || "Utilisateur"}
                 width={40}
                 height={40}
-                className="object-cover"
+                className="object-cover object-center w-full h-full"
               />
             </div>
           ) : (
@@ -119,7 +118,7 @@ export default function FilmCard({ review }: Props) {
         </div>
       </div>
 
-      {/*Film et Avis */}
+      {/* Film & Avis */}
       <div className="flex flex-col md:flex-row">
         {film?.poster_url && (
           <div className="relative w-full md:w-1/3 aspect-[500/700] border-r">
@@ -136,7 +135,6 @@ export default function FilmCard({ review }: Props) {
           <h2 className="text-2xl font-bold text-gray-900">{film?.title}</h2>
           <p className="text-sm text-gray-500 mb-3">{film?.year}</p>
 
-          {/* Etoiles */}
           <RatingLine label="Scénario" value={review.scenario} />
           <RatingLine label="Musique" value={review.music} />
           <RatingLine label="Effets spéciaux" value={review.special_effects} />
@@ -150,7 +148,6 @@ export default function FilmCard({ review }: Props) {
 
       {/* Commentaires */}
       <div className="px-6 py-4 border-t bg-gray-50 space-y-4">
-
         <h3 className="text-sm font-semibold text-gray-600">Commentaires</h3>
 
         {comments.length === 0 && (
@@ -161,8 +158,14 @@ export default function FilmCard({ review }: Props) {
           {visibleComments.map((c) => (
             <div key={c.id} className="flex items-start space-x-2">
               {c.profiles?.avatar_url ? (
-                <div className="w-7 h-7 rounded-full overflow-hidden">
-                  <Image src={c.profiles.avatar_url} alt="avatar" width={28} height={28} className="object-cover" />
+                <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+                  <Image
+                    src={c.profiles.avatar_url}
+                    alt="avatar"
+                    width={28}
+                    height={28}
+                    className="object-cover object-center w-full h-full"
+                  />
                 </div>
               ) : (
                 <div className="w-7 h-7 bg-gray-300 rounded-full" />
@@ -173,7 +176,9 @@ export default function FilmCard({ review }: Props) {
                   <span className="font-semibold mr-1">{c.profiles?.display_name}</span>
                   {c.content}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">{new Date(c.created_at).toLocaleDateString()}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date(c.created_at).toLocaleDateString()}
+                </p>
               </div>
             </div>
           ))}
@@ -251,8 +256,14 @@ function UserAvatarMini() {
   if (!avatar) return <div className="w-7 h-7 rounded-full bg-gray-300" />;
 
   return (
-    <div className="w-7 h-7 rounded-full overflow-hidden">
-      <Image src={avatar} alt="me" width={28} height={28} className="object-cover" />
+    <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+      <Image
+        src={avatar}
+        alt="me"
+        width={28}
+        height={28}
+        className="object-cover object-center w-full h-full"
+      />
     </div>
   );
 }
