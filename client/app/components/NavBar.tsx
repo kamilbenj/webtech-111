@@ -13,6 +13,7 @@ export default function NavBar() {
   const links = [
     { href: '/', label: 'Discover' },
     { href: '/posts', label: 'Posts' },
+    { href: '/friends', label: 'Friends' },      // <-- ICI ajouté
     { href: '/contact', label: 'Contact' },
     { href: '/about', label: 'About' },
   ]
@@ -34,6 +35,7 @@ export default function NavBar() {
   return (
     <header className="sticky top-0 z-50 bg-white backdrop-blur-md shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        
         {/* Logo */}
         <Link
           href="/"
@@ -50,27 +52,32 @@ export default function NavBar() {
                 <Link
                   key={href}
                   href={href}
-                  className="relative text-base text-gray-700 hover:text-transparent hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400 bg-clip-text font-medium transition"
+                  className="relative text-base text-gray-700 hover:text-transparent 
+                             hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400
+                             bg-clip-text font-medium transition"
                 >
                   {label}
                 </Link>
               ))}
             </nav>
 
-            {/* Bouton utilisateur + menu déroulant */}
+            {/* Menu utilisateur */}
             <UserMenu />
           </div>
         ) : (
           <div className="flex items-center space-x-4">
             <Link
               href="/login"
-              className="text-sm font-semibold text-gray-700 hover:text-transparent hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400 bg-clip-text transition"
+              className="text-sm font-semibold text-gray-700 hover:text-transparent 
+                         hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-400 bg-clip-text transition"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="text-sm font-semibold px-4 py-2 rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 transition"
+              className="text-sm font-semibold px-4 py-2 rounded-full text-white 
+                         bg-gradient-to-r from-orange-500 to-yellow-400
+                         hover:from-orange-600 hover:to-yellow-500 transition"
             >
               Sign up
             </Link>

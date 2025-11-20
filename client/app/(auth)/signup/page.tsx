@@ -92,7 +92,7 @@ export default function SignupPage() {
       // Redirection
       router.replace('/feed')
     } catch (err) {
-      console.error(err)
+      console.log("Signup error:", err);
       const message =
         (err as AuthError)?.message ||
         (err instanceof Error ? err.message : 'Erreur inconnue')
