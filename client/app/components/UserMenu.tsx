@@ -10,7 +10,6 @@ export default function UserMenu() {
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
-  // Fermer le menu si clic en dehors
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -29,25 +28,23 @@ export default function UserMenu() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Bouton utilisateur */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 shadow-md transition"
+        className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40 transition hover:from-amber-300 hover:to-orange-400"
       >
-        <User className="w-5 h-5 text-white" />
+        <User className="h-5 w-5" />
       </button>
 
-      {/* Menu déroulant */}
       {open && (
-        <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-50 animate-fadeIn">
+        <div className="absolute right-0 mt-3 w-52 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/95 shadow-xl shadow-black/60">
           <button
             onClick={() => {
               router.push('/profile')
               setOpen(false)
             }}
-            className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 transition"
+            className="flex w-full items-center px-4 py-3 text-sm text-slate-200 transition hover:bg-slate-900"
           >
-            <User className="w-4 h-4 mr-2 text-gray-500" /> Mon compte
+            <User className="mr-2 h-4 w-4 text-slate-400" /> Mon compte
           </button>
 
           <button
@@ -55,18 +52,18 @@ export default function UserMenu() {
               router.push('/settings')
               setOpen(false)
             }}
-            className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 transition"
+            className="flex w-full items-center px-4 py-3 text-sm text-slate-200 transition hover:bg-slate-900"
           >
-            <Settings className="w-4 h-4 mr-2 text-gray-500" /> Paramètres
+            <Settings className="mr-2 h-4 w-4 text-slate-400" /> Paramètres
           </button>
 
-          <hr className="border-gray-200" />
+          <hr className="border-slate-800" />
 
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 transition"
+            className="flex w-full items-center px-4 py-3 text-sm text-red-400 transition hover:bg-red-950/40"
           >
-            <LogOut className="w-4 h-4 mr-2" /> Déconnexion
+            <LogOut className="mr-2 h-4 w-4" /> Déconnexion
           </button>
         </div>
       )}

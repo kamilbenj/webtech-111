@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import UserMenu from './UserMenu'
+import { Film } from 'lucide-react'
 
 export default function NavBar() {
   const router = useRouter()
   const [logged, setLogged] = useState(false)
 
   const links = [
-    { href: '/', label: 'Discover' },
-    { href: '/posts', label: 'Posts' },
+    { href: '/feed', label: 'Feed' },
+    { href: '/posts', label: 'Post' },
     { href: '/friends', label: 'Friends' },
   ]
 
@@ -23,98 +24,58 @@ export default function NavBar() {
     }
     checkUser()
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setLogged(!!session)
-    })
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setLogged(!!session)
+      }
+    )
 
     return () => listener.subscription.unsubscribe()
   }, [])
 
   return (
-    <header
-      className="
-      sticky top-0 z-50
-      bg-[var(--card-bg)]
-      border-b border-[var(--border-vintage)]
-      shadow-[0_3px_10px_rgba(60,50,40,0.15)]
-      backdrop-blur-sm
-      "
-    >
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-
-        {/* --- LOGO Vintage --- */}
-        <Link
-          href="/"
-          className="
-            text-3xl font-bold tracking-wider 
-            title-vintage
-            text-[var(--foreground)]
-            hover:text-[var(--accent)]
-            transition
-          "
+    <header className="sticky top-0 z-40 border-b border-slate-800 bg-black/60 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+        {/* Logo */}
+        <button
+          type="button"
+          onClick={() => router.push('/feed')}
+          className="flex items-center gap-2"
         >
-          CineVerse<span className="opacity-70">.</span>
-        </Link>
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/40">
+            <Film className="h-5 w-5 text-slate-950" />
+          </div>
+          <span className="text-lg font-semibold tracking-tight text-slate-50">
+            CineVerse<span className="text-amber-400">.</span>
+          </span>
+        </button>
 
-        {/* --- NAVIGATION --- */}
         {logged ? (
-          <div className="flex items-center space-x-6">
-
-            {/* LINKS */}
-            <nav className="hidden md:flex space-x-8">
+          <div className="flex items-center gap-6">
+            <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
               {links.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="
-                    relative text-base font-medium
-                    text-[var(--foreground)]
-                    hover:text-[var(--accent)]
-                    transition
-                    after:absolute after:-bottom-1 after:left-0 
-                    after:w-full after:h-[2px]
-                    after:bg-[var(--accent)]
-                    after:scale-x-0 hover:after:scale-x-100
-                    after:transition-transform after:duration-300
-                    after:origin-left
-                  "
+                  className="text-sm text-slate-300 transition hover:text-amber-300"
                 >
                   {label}
                 </Link>
               ))}
             </nav>
-
-            {/* --- USER MENU --- */}
             <UserMenu />
           </div>
         ) : (
-          <div className="flex items-center space-x-4">
-
-            {/* LOGIN */}
+          <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="
-                text-sm font-semibold 
-                text-[var(--foreground)]
-                hover:text-[var(--accent)]
-                transition
-              "
+              className="text-xs font-semibold text-slate-300 hover:text-amber-300"
             >
               Login
             </Link>
-
-            {/* SIGNUP */}
             <Link
               href="/signup"
-              className="
-                text-sm font-semibold px-4 py-2 rounded-full
-                bg-[var(--accent)]
-                text-white
-                border border-black/10
-                hover:bg-[var(--accent-light)]
-                transition
-                shadow-sm
-              "
+              className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-xs font-semibold text-slate-950 shadow-md shadow-orange-500/40 hover:from-amber-300 hover:to-orange-400"
             >
               Sign up
             </Link>

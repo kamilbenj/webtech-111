@@ -1,65 +1,69 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { supabase } from '@/lib/supabaseClient'
+import { Star, MessageCircle, Send, MoreHorizontal } from 'lucide-react'
 
 export type Review = {
-  id: number;
-  film_id: number;
-  scenario: number;
-  music: number;
-  special_effects: number;
-  opinion: string;
-  created_at: string;
+  id: number
+  film_id: number
+  scenario: number
+  music: number
+  special_effects: number
+  opinion: string
+  created_at: string
   films?: {
-    title?: string;
-    year?: string;
-    poster_url?: string;
-  };
+    title?: string
+    year?: string
+    poster_url?: string
+  }
   profiles?: {
-    display_name?: string;
-    avatar_url?: string;
-  };
+    display_name?: string
+    avatar_url?: string
+  }
   review_comments?: {
-    id: number;
-    content: string;
-    created_at: string;
+    id: number
+    content: string
+    created_at: string
     profiles: {
-      display_name?: string;
-      avatar_url?: string;
-    } | null;
-  }[];
-};
+      display_name?: string
+      avatar_url?: string
+    } | null
+  }[]
+}
 
 type Props = {
-  review: Review;
-};
+  review: Review
+}
 
 export default function FilmCard({ review }: Props) {
-  const film = review.films;
-  const initialComments = review.review_comments || [];
+  const film = review.films
+  const initialComments = review.review_comments || []
 
-  const COMMENTS_SHOWN = 2;
-  const [comments, setComments] = useState(initialComments);
-  const [showAll, setShowAll] = useState(false);
-  const visibleComments = showAll ? comments : comments.slice(0, COMMENTS_SHOWN);
+  const COMMENTS_SHOWN = 2
+  const [comments, setComments] = useState(initialComments)
+  const [showAll, setShowAll] = useState(false)
+  const visibleComments = showAll ? comments : comments.slice(0, COMMENTS_SHOWN)
 
-  const [commentText, setCommentText] = useState("");
-  const [sending, setSending] = useState(false);
+  const [commentText, setCommentText] = useState('')
+  const [sending, setSending] = useState(false)
 
   const handleSendComment = async () => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim()) return
 
-    setSending(true);
+    setSending(true)
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    } = await supabase.auth.getUser()
+    if (!user) {
+      setSending(false)
+      return
+    }
 
     const { data: newComment } = await supabase
-      .from("review_comments")
+      .from('review_comments')
       .insert({
         review_id: review.id,
         author_id: user.id,
@@ -74,130 +78,135 @@ export default function FilmCard({ review }: Props) {
         )
       `
       )
-      .single();
+      .single()
 
     if (newComment) {
-      setComments((prev) => [newComment, ...prev]);
-      setCommentText("");
+      setComments((prev) => [newComment, ...prev])
+      setCommentText('')
     }
 
-    setSending(false);
-  };
+    setSending(false)
+  }
+
+  const formattedDate = new Date(review.created_at).toLocaleDateString()
 
   return (
-    <article
-      className="
-      w-full max-w-4xl mx-auto
-      bg-[rgba(255,252,245,0.9)]
-      border border-[#d6c7a1]
-      rounded-xl
-      shadow-[0_4px_12px_rgba(80,60,40,0.25)]
-      backdrop-blur-[1px]
-      overflow-hidden
-      relative
-      filmcard-texture
-    "
-    >
-      {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#ccbfa0] bg-[rgba(255,249,235,0.7)]">
-        <div className="flex items-center space-x-3">
+    <article className="card w-full max-w-3xl overflow-hidden">
+      {/* Header auteur */}
+      <div className="flex items-center justify-between border-b border-slate-800/70 px-5 py-4">
+        <div className="flex items-center gap-3">
           {review.profiles?.avatar_url ? (
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-[#bda887] shadow-sm">
-  <Image
-    src={review.profiles.avatar_url}
-    alt={review.profiles.display_name || 'Utilisateur'}
-    width={40}
-    height={40}
-    className="object-center object-cover w-full h-full"
-  />
-</div>
-
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border border-slate-700">
+              <Image
+                src={review.profiles.avatar_url}
+                alt={review.profiles.display_name || 'User'}
+                fill
+                className="object-cover"
+              />
+            </div>
           ) : (
-            <div className="w-10 h-10 bg-[#d5c7a1] rounded-full flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-lg">
               🎬
             </div>
           )}
 
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-slate-50">
+              {review.profiles?.display_name || 'Utilisateur'}
+            </span>
+            <span className="text-xs text-slate-400">{formattedDate}</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/70 text-slate-400 hover:text-slate-100"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Contenu film + notes */}
+      <div className="flex flex-col gap-4 px-5 py-4 md:flex-row">
+        {/* Poster */}
+        {film?.poster_url && (
+          <div className="relative mx-auto h-60 w-40 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900 md:mx-0">
+            <Image
+              src={film.poster_url}
+              alt={film.title || 'Affiche du film'}
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        {/* Infos film / avis */}
+        <div className="flex-1 space-y-3">
           <div>
-            <p className="font-semibold text-[#3a2f1a] text-sm">
-              {review.profiles?.display_name || "Utilisateur"}
-            </p>
-            <p className="text-xs text-[#7a6a53]">
-              {new Date(review.created_at).toLocaleDateString()}
-            </p>
+            <h2 className="text-lg font-semibold text-slate-50">
+              {film?.title || 'Titre inconnu'}
+            </h2>
+            {film?.year && (
+              <p className="text-xs uppercase tracking-wide text-slate-400">
+                {film.year}
+              </p>
+            )}
+          </div>
+
+          {/* Ratings */}
+          <div className="space-y-2 text-sm">
+            <RatingLine label="Scénario" value={review.scenario} />
+            <RatingLine label="Musique" value={review.music} />
+            <RatingLine label="Effets spéciaux" value={review.special_effects} />
+          </div>
+
+          {/* Avis */}
+          <div className="mt-2 rounded-xl bg-slate-900/70 px-4 py-3 text-sm text-slate-100">
+            <p className="leading-relaxed">{review.opinion}</p>
           </div>
         </div>
       </div>
 
-      {/* FILM + AVIS */}
-      <div className="flex flex-col md:flex-row">
+      {/* Footer : nombre de commentaires etc. */}
+      <div className="flex items-center gap-4 border-t border-slate-800/70 px-5 py-3 text-xs text-slate-400">
+        <div className="inline-flex items-center gap-2">
+          <MessageCircle className="h-4 w-4" />
+          <span>{comments.length} commentaires</span>
+        </div>
+      </div>
 
-  {film?.poster_url && (
-    <div className="relative w-full md:w-1/3 aspect-[500/700] border-r border-[#d6c7a1] bg-transparent">
-      <Image
-        src={film.poster_url}
-        alt={film.title || 'Affiche du film'}
-        fill
-        className="object-contain p-3"
-      />
-    </div>
-  )}
-
-  <div className="flex-1 px-6 py-5 relative
-    before:content-[''] before:absolute before:inset-0
-    before:bg-[url('/paper-texture.png')] before:bg-cover
-    before:opacity-50 before:pointer-events-none"
-  >
-    <h2 className="text-2xl font-bold text-[#3a2f1a]">{film?.title}</h2>
-    <p className="text-sm text-[#7a6a53] mb-3">{film?.year}</p>
-
-    <RatingLine label="Scénario" value={review.scenario} />
-    <RatingLine label="Musique" value={review.music} />
-    <RatingLine label="Effets spéciaux" value={review.special_effects} />
-
-    <div className="mt-4">
-      <h3 className="font-semibold text-[#3a2f1a]">Avis :</h3>
-      <p className="text-sm text-[#4a3d29]">{review.opinion}</p>
-    </div>
-  </div>
-</div>
-
-
-      {/* COMMENTAIRES */}
-      <div className="px-6 py-4 border-t border-[#ccbfa0] bg-[rgba(255,249,235,0.7)] space-y-4">
-        <h3 className="text-sm font-semibold text-[#6a5840]">Commentaires</h3>
-
+      {/* Commentaires */}
+      <div className="space-y-4 border-t border-slate-800/70 bg-slate-950/40 px-5 py-4">
         {comments.length === 0 && (
-          <p className="text-[#7a6a53] text-xs italic">
-            Aucun commentaire pour l’instant.
+          <p className="text-xs italic text-slate-500">
+            Aucun commentaire pour l’instant. Sois le premier à réagir !
           </p>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {visibleComments.map((c) => (
-            <div key={c.id} className="flex items-start space-x-2">
+            <div key={c.id} className="flex items-start gap-2">
               {c.profiles?.avatar_url ? (
-                <div className="w-7 h-7 rounded-full overflow-hidden border border-[#bda887] shadow-sm">
+                <div className="relative h-7 w-7 overflow-hidden rounded-full border border-slate-700">
                   <Image
                     src={c.profiles.avatar_url}
                     alt="avatar"
-                    width={28}
-                    height={28}
+                    fill
                     className="object-cover"
                   />
                 </div>
               ) : (
-                <div className="w-7 h-7 bg-[#d5c7a1] rounded-full" />
+                <div className="h-7 w-7 rounded-full bg-slate-800" />
               )}
 
-              <div className="flex flex-col">
-                <p className="text-sm text-[#4a3d29] break-words whitespace-pre-wrap">
-                  <span className="font-semibold mr-1">
-                    {c.profiles?.display_name}
-                  </span>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-slate-100">
+                  {c.profiles?.display_name || 'Utilisateur'}
+                </p>
+                <p className="text-sm text-slate-200 whitespace-pre-wrap">
                   {c.content}
                 </p>
-                <p className="text-xs text-[#7a6a53] mt-1">
+                <p className="mt-1 text-[10px] uppercase tracking-wide text-slate-500">
                   {new Date(c.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -208,83 +217,90 @@ export default function FilmCard({ review }: Props) {
         {comments.length > COMMENTS_SHOWN && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className="text-[#6a5840] text-xs font-medium hover:underline"
+            className="text-xs font-medium text-amber-400 hover:text-amber-300"
           >
-            {showAll ? "Voir moins de commentaires" : "Voir plus de commentaires"}
+            {showAll ? 'Voir moins de commentaires' : 'Voir plus de commentaires'}
           </button>
         )}
 
         {/* Ajout commentaire */}
-        <div className="flex items-center space-x-2 pt-2">
+        <div className="flex items-center gap-2 pt-1">
           <UserAvatarMini />
 
-          <input
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Ajouter un commentaire..."
-            className="flex-1 text-xs py-1 bg-transparent focus:outline-none text-[#4a3d29]"
-          />
-
-          <button
-            onClick={handleSendComment}
-            disabled={sending}
-            className="text-[var(--accent)] text-xs font-semibold disabled:opacity-50"
-          >
-            Publier
-          </button>
+          <div className="flex flex-1 items-center rounded-full bg-slate-900/80 px-3 py-1">
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Ajouter un commentaire…"
+              className="flex-1 bg-transparent text-xs text-slate-100 placeholder:text-slate-500 outline-none"
+            />
+            <button
+              onClick={handleSendComment}
+              disabled={sending}
+              className="ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-400 text-slate-950 disabled:opacity-50"
+            >
+              <Send className="h-3 w-3" />
+            </button>
+          </div>
         </div>
       </div>
     </article>
-  );
+  )
 }
 
 function RatingLine({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center space-x-2 text-sm">
-      <p className="w-28 font-semibold">{label} :</p>
+    <div className="flex items-center gap-3 text-sm text-slate-200">
+      <p className="w-28 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
       <StarRating rating={value} />
+      <span className="text-xs text-slate-400">{value}/5</span>
     </div>
-  );
+  )
 }
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex space-x-1">
+    <div className="flex gap-1">
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < rating ? "text-yellow-400" : "text-gray-300"}>
-          ★
-        </span>
+        <Star
+          key={i}
+          className={`h-4 w-4 ${
+            i < rating ? 'fill-amber-400 text-amber-400' : 'text-slate-600'
+          }`}
+        />
       ))}
     </div>
-  );
+  )
 }
 
 function UserAvatarMini() {
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return;
+      if (!user) return
       const { data } = await supabase
-        .from("profiles")
-        .select("avatar_url")
-        .eq("id", user.id)
-        .single();
-      setAvatar(data?.avatar_url ?? null);
-    });
-  }, []);
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single()
+      setAvatar(data?.avatar_url ?? null)
+    })
+  }, [])
 
-  if (!avatar) return <div className="w-7 h-7 rounded-full bg-gray-300" />;
+  if (!avatar)
+    return <div className="h-7 w-7 rounded-full bg-slate-700" />
 
   return (
-    <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+    <div className="relative h-7 w-7 overflow-hidden rounded-full border border-slate-700">
       <Image
         src={avatar}
         alt="me"
-        width={28}
-        height={28}
-        className="object-cover object-center w-full h-full"
+        fill
+        className="object-cover object-center"
       />
     </div>
-  );
+  )
 }

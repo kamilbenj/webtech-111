@@ -1,232 +1,213 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import Link from "next/link";
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import Link from 'next/link'
+import { Search, UserPlus, Users } from 'lucide-react'
 
 export default function FriendsPage() {
-  const [friends, setFriends] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-  const [results, setResults] = useState<any[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [friends, setFriends] = useState<any[]>([])
+  const [search, setSearch] = useState('')
+  const [results, setResults] = useState<any[]>([])
+  const [pendingRequests, setPendingRequests] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const loadFriends = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData?.user;
-    if (!user) return;
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData?.user
+    if (!user) return
 
-    setUserId(user.id);
+    setUserId(user.id)
 
-    // --- Amis acceptés ---
     const { data: friendships } = await supabase
-      .from("friendships")
-      .select("*")
+      .from('friendships')
+      .select('*')
       .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-      .eq("status", "accepted");
+      .eq('status', 'accepted')
 
     const friendIds =
       friendships?.map((f) =>
         f.requester_id === user.id ? f.addressee_id : f.requester_id
-      ) || [];
+      ) || []
 
     if (friendIds.length > 0) {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .in("id", friendIds);
+        .from('profiles')
+        .select('id, display_name, avatar_url')
+        .in('id', friendIds)
 
-      setFriends(profiles || []);
+      setFriends(profiles || [])
     }
 
-    // --- Demandes en attente envoyées ---
     const { data: pending } = await supabase
-      .from("friendships")
-      .select("addressee_id")
-      .eq("requester_id", user.id)
-      .eq("status", "pending");
+      .from('friendships')
+      .select('addressee_id')
+      .eq('requester_id', user.id)
+      .eq('status', 'pending')
 
-    setPendingRequests(pending?.map((p) => p.addressee_id) || []);
+    setPendingRequests(pending?.map((p) => p.addressee_id) || [])
 
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
-  // --- Recherche utilisateurs ---
   const handleSearch = async (value: string) => {
-    setSearch(value);
+    setSearch(value)
 
-    if (value.trim() === "") {
-      setResults([]);
-      return;
+    if (value.trim() === '') {
+      setResults([])
+      return
     }
 
     const { data } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url")
-      .ilike("display_name", `%${value}%`)
-      .limit(10);
+      .from('profiles')
+      .select('id, display_name, avatar_url')
+      .ilike('display_name', `%${value}%`)
+      .limit(10)
 
-    setResults(data || []);
-  };
+    setResults(data || [])
+  }
 
-  // --- Ajouter un ami ---
   const sendFriendRequest = async (targetId: string) => {
-    if (!userId) return;
+    if (!userId) return
 
-    const { error } = await supabase.from("friendships").insert({
+    const { error } = await supabase.from('friendships').insert({
       requester_id: userId,
       addressee_id: targetId,
-      status: "pending",
-    });
+      status: 'pending',
+    })
 
     if (!error) {
-      setPendingRequests((prev) => [...prev, targetId]);
+      setPendingRequests((prev) => [...prev, targetId])
     }
-  };
+  }
 
   useEffect(() => {
-    loadFriends();
-  }, []);
+    loadFriends()
+  }, [])
 
   return (
-    <div
-      className="
-        min-h-screen w-full
-        bg-[url('/paper-texture.jpg')]
-        bg-center bg-fixed bg-[length:550px]
-        py-12 rounded-3xl overflow-hidden mx-4
-      "
-    >
-      <main
-        className="
-          p-8 max-w-2xl mx-auto space-y-6
-          bg-[rgba(255,252,245,0.85)]
-          rounded-xl shadow-lg
-          border border-[#d6c7a1]
-          backdrop-blur-sm
-        "
-      >
-        <h1 className="text-3xl font-bold text-[#3a2f1a]">Mes amis</h1>
+    <main className="min-h-screen bg-slate-950 px-4 py-8">
+      <div className="mx-auto flex max-w-4xl flex-col gap-6">
+        <header className="flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-semibold text-slate-50">Friends</h1>
+            <p className="text-xs text-slate-400">
+              Gère tes amis et découvre de nouveaux cinéphiles.
+            </p>
+          </div>
+          <div className="hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs text-slate-300 sm:flex">
+            <Users className="h-4 w-4 text-slate-400" />
+            <span>{friends.length} amis</span>
+          </div>
+        </header>
 
-        {/* Recherche */}
-        <div className="relative p-4 rounded-lg border border-[#d6c7a1] bg-[rgba(255,249,235,0.7)] shadow-sm">
-          <input
-            type="text"
-            placeholder="Rechercher un utilisateur…"
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-2 rounded bg-white/70 border border-[#ccbfa0] text-[#3a2f1a]"
-          />
+        {/* Carte recherche */}
+        <section className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 shadow-lg shadow-black/50">
+          <div className="relative">
+            <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100">
+              <Search className="h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Rechercher un utilisateur…"
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full bg-transparent text-xs text-slate-100 outline-none placeholder:text-slate-500"
+              />
+            </div>
 
-          {/* Résultats recherche */}
-          {results.length > 0 && (
-            <ul
-              className="
-                absolute left-4 right-4 mt-2
-                bg-[rgba(255,252,245,0.95)]
-                border border-[#ccbfa0]
-                rounded-lg shadow-md
-                max-h-60 overflow-y-auto z-50
-              "
-            >
-              {results.map((user) => {
-                const alreadyFriend = friends.some((f) => f.id === user.id);
-                const pending = pendingRequests.includes(user.id);
-                const isSelf = user.id === userId;
+            {results.length > 0 && (
+              <ul className="absolute left-0 right-0 z-20 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/95 text-sm shadow-xl shadow-black/60">
+                {results.map((user) => {
+                  const alreadyFriend = friends.some((f) => f.id === user.id)
+                  const pending = pendingRequests.includes(user.id)
+                  const isSelf = user.id === userId
 
-                return (
-                  <li
-                    key={user.id}
-                    className="flex items-center justify-between p-3"
-                  >
-                    <Link
-                      href={`/friends/${user.id}`}
-                      className="flex items-center gap-3"
+                  return (
+                    <li
+                      key={user.id}
+                      className="flex items-center justify-between px-3 py-2 hover:bg-slate-900"
                     >
-                      <img
-                        src={user.avatar_url || "/default-avatar.png"}
-                        className="w-10 h-10 rounded-full border border-[#bda887] object-cover"
-                      />
-                      <span className="text-[#3a2f1a]">
-                        {user.display_name}
-                      </span>
-                    </Link>
-
-                    {!isSelf && !alreadyFriend && !pending && (
-                      <button
-                        onClick={() => sendFriendRequest(user.id)}
-                        className="px-3 py-1 text-xs bg-[var(--accent)] hover:bg-[var(--accent-light)] text-white rounded-lg shadow"
+                      <Link
+                        href={`/friends/${user.id}`}
+                        className="flex items-center gap-3"
                       >
-                        Ajouter
-                      </button>
-                    )}
+                        <img
+                          src={user.avatar_url || '/default-avatar.png'}
+                          className="h-9 w-9 rounded-full border border-slate-700 object-cover"
+                        />
+                        <span className="text-xs font-medium text-slate-100">
+                          {user.display_name}
+                        </span>
+                      </Link>
 
-                    {pending && (
-                      <span className="text-sm text-gray-500 italic">
-                        En attente…
-                      </span>
-                    )}
+                      {!isSelf && !alreadyFriend && !pending && (
+                        <button
+                          onClick={() => sendFriendRequest(user.id)}
+                          className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow-sm shadow-orange-500/40"
+                        >
+                          <UserPlus className="h-3 w-3" />
+                          Ajouter
+                        </button>
+                      )}
 
-                    {alreadyFriend && (
-                      <span className="text-sm text-green-700 font-semibold">
-                        Ami ✓
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+                      {pending && (
+                        <span className="text-[11px] italic text-slate-400">
+                          En attente…
+                        </span>
+                      )}
+
+                      {alreadyFriend && (
+                        <span className="text-[11px] font-semibold text-emerald-400">
+                          Ami ✓
+                        </span>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
+        </section>
 
         {/* Liste amis */}
-        <div className="p-4 rounded-lg border border-[#d6c7a1] bg-[rgba(255,249,235,0.7)] shadow-sm">
-          <h2 className="text-xl font-semibold text-[#3a2f1a] mb-3">
-            Liste de mes amis
+        <section className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 shadow-lg shadow-black/50">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-100">
+            <Users className="h-4 w-4 text-slate-400" />
+            Mes amis
           </h2>
 
-          {friends.length === 0 ? (
-            <p className="text-gray-600">Tu n’as pas encore d’amis 😢</p>
+          {loading ? (
+            <p className="text-xs text-slate-400">Chargement…</p>
+          ) : friends.length === 0 ? (
+            <p className="text-xs text-slate-400">
+              Tu n’as pas encore d’amis. Invite des gens à te suivre 😄
+            </p>
           ) : (
             <ul className="space-y-3">
               {friends.map((f) => (
                 <li
                   key={f.id}
-                  className="
-                    relative flex items-center gap-4 p-4
-                    rounded-xl border border-[#d6c7a1]
-                    shadow-[0_2px_6px_rgba(60,50,40,0.15)]
-                    overflow-hidden
-                    bg-[rgba(255,252,245,0.85)]
-                    before:content-['']
-                    before:absolute before:inset-0
-                    before:bg-[url('/paper-texture.jpg')]
-                    before:bg-cover before:bg-center
-                    before:opacity-10
-                    hover:before:opacity-20
-                    before:transition-opacity
-                  "
+                  className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3"
                 >
-                  <img
-                    src={f.avatar_url || "/default-avatar.png"}
-                    className="
-                      w-12 h-12 rounded-full border border-[#bda887]
-                      object-cover relative z-10
-                    "
-                  />
-
-                  <Link href={`/friends/${f.id}`} className="relative z-10">
-                    <span className="font-medium text-[#3a2f1a] hover:underline">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={f.avatar_url || '/default-avatar.png'}
+                      className="h-10 w-10 rounded-full border border-slate-700 object-cover"
+                    />
+                    <Link
+                      href={`/friends/${f.id}`}
+                      className="text-sm font-medium text-slate-100 hover:text-amber-300"
+                    >
                       {f.display_name}
-                    </span>
-                  </Link>
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
           )}
-        </div>
-      </main>
-    </div>
-  );
+        </section>
+      </div>
+    </main>
+  )
 }
