@@ -52,9 +52,7 @@ export default function FriendProfile({
 
       setReviews(reviewsData || []);
 
-      /* COMMON FRIENDS */
-
-      // 1. Amis du user
+      // Amis du user
       const { data: userFriends } = await supabase
         .from("friendships")
         .select("*")
@@ -69,7 +67,7 @@ export default function FriendProfile({
         ),
       ];
 
-      // 2. Amis du friend
+      // Amis du friend
       const { data: friendFriends } = await supabase
         .from("friendships")
         .select("*")
@@ -84,7 +82,7 @@ export default function FriendProfile({
         ),
       ];
 
-      // 3. Intersection
+      // amis en commun
       const sharedIds = userFriendIds.filter((id) =>
         friendFriendIds.includes(id)
       );
@@ -107,7 +105,7 @@ export default function FriendProfile({
 
   return (
     <main className="p-8 max-w-3xl mx-auto">
-      {/* HEADER */}
+      {/* --- HEADER --- */}
       <div className="flex flex-col items-center mb-6">
         <img
           src={profile.avatar_url || "/default-avatar.png"}
@@ -117,7 +115,7 @@ export default function FriendProfile({
         <p className="text-gray-600">{profile.bio ?? "Aucune bio."}</p>
       </div>
 
-      {/* COMMON FRIENDS */}
+      {/* --- AMIS EN COMMUN --- */}
       <h2 className="text-2xl font-semibold mb-3">Amis en commun</h2>
 
       {commonFriends.length === 0 ? (
@@ -127,22 +125,41 @@ export default function FriendProfile({
           {commonFriends.map((f) => (
             <li
   key={f.id}
-  className="flex items-center gap-4 border p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer"
+  className="
+    relative flex items-center gap-4 p-4 rounded-xl 
+    bg-[rgba(255,252,245,0.9)]
+    border border-[#d6c7a1]
+    shadow-[0_4px_12px_rgba(80,60,40,0.25)]
+    backdrop-blur-[1px]
+    overflow-hidden
+  "
 >
-  <a href={`/friends/${f.id}`} className="flex items-center gap-4">
+  {/* texture papier */}
+  <div
+    className="
+      absolute inset-0 
+      bg-[url('/paper-texture.jpg')] 
+      opacity-90
+      pointer-events-none
+    "
+  />
+
+  <a href={`/friends/${f.id}`} className="flex items-center gap-4 relative z-10">
     <img
-      src={f.avatar_url || "/default-avatar.png"}
-      className="w-12 h-12 rounded-full object-cover"
+      src={f.avatar_url || '/default-avatar.png'}
+      className="w-12 h-12 rounded-full border border-[#bda887] object-cover"
     />
-    <span className="font-medium">{f.display_name}</span>
+    <span className="font-medium text-[#3a2f1a]">{f.display_name}</span>
   </a>
 </li>
+
+
 
           ))}
         </ul>
       )}
 
-      {/* REVIEWS */}
+      {/* --- REVIEWS --- */}
       <h2 className="text-2xl font-semibold mb-4">Ses critiques</h2>
 
       {reviews.length === 0 ? (
