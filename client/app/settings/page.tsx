@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function SettingsPage() {
   const [buttonColor, setButtonColor] = useState('orange')
@@ -19,21 +19,26 @@ export default function SettingsPage() {
     document.documentElement.setAttribute('data-button', color)
   }
 
+  // ⭐ APPLY THEME ON CHANGE
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
+
   return (
     <main className="main-shell px-4 py-6 md:px-0">
       <div className="mx-auto max-w-4xl flex flex-col gap-6">
         <header>
           <h1 className="text-xl font-semibold text-slate-50">General Settings</h1>
-          <p className="text-xs text-slate-400">
-            Customize your overall CineVerse experience.
-          </p>
+          <p className="text-xs text-slate-400">Customize your overall CineVerse experience.</p>
         </header>
 
+        {/* Appearance */}
         <section className={cardClass}>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Appearance
           </h2>
 
+          {/* Button color */}
           <div className="flex items-center justify-between py-2">
             <span>Button color</span>
             <select
@@ -48,33 +53,31 @@ export default function SettingsPage() {
             </select>
           </div>
 
+          {/* THEME SWITCH */}
           <div className="flex items-center justify-between py-2">
-            <span>Mode d'affichage</span>
+            <span>Theme</span>
             <div className="flex gap-3">
               <button
                 onClick={() => setTheme('light')}
                 className={`px-3 py-1 rounded-lg text-xs ${
-                  theme === 'light'
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-800 text-slate-300'
+                  theme === 'light' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-300'
                 }`}
               >
-                Clair
+                Light
               </button>
               <button
                 onClick={() => setTheme('dark')}
                 className={`px-3 py-1 rounded-lg text-xs ${
-                  theme === 'dark'
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-800 text-slate-300'
+                  theme === 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-300'
                 }`}
               >
-                Sombre
+                Dark
               </button>
             </div>
           </div>
         </section>
 
+        {/* Notifications */}
         <section className={cardClass}>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Notifications
@@ -117,6 +120,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
+        {/* Language */}
         <section className={cardClass}>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Languages
@@ -124,9 +128,7 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-2">
             <span>Language</span>
-            <select
-              className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs"
-            >
+            <select className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs">
               <option value="orange">Francais</option>
               <option value="blue">English</option>
               <option value="green">Español</option>

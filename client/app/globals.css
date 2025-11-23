@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-
+/* Default (dark) theme */
 :root {
   --background: #050816;
   --foreground: #f9fafb;
@@ -9,71 +9,63 @@
   --surface-soft: #15182a;
   --border-subtle: rgba(148, 163, 184, 0.35);
 
-  --accent: #f59e0b;
+  --accent: #f59e0b;     /* default = orange */
   --accent-soft: #fde68a;
 
   --danger: #ef4444;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #f9fafb;
-    --foreground: #020617;
-    --surface: #ffffff;
-    --surface-soft: #f3f4f6;
-    --border-subtle: rgba(148, 163, 184, 0.5);
-  }
-}
-
-html[data-theme='dark'] {
-  --background: #050816;
-  --foreground: #f9fafb;
-  --surface: #0b1020;
-  --surface-soft: #15182a;
-  --border-subtle: rgba(148, 163, 184, 0.35);
-}
-
-html[data-theme='light'] {
+/* Light theme */
+:root[data-theme="light"] {
   --background: #f9fafb;
   --foreground: #020617;
+
   --surface: #ffffff;
   --surface-soft: #f3f4f6;
   --border-subtle: rgba(148, 163, 184, 0.5);
 }
 
+/* Dark theme (explicit, same as default) */
+:root[data-theme="dark"] {
+  --background: #050816;
+  --foreground: #f9fafb;
 
-html[data-button='orange'] {
+  --surface: #0b1020;
+  --surface-soft: #15182a;
+  --border-subtle: rgba(148, 163, 184, 0.35);
+}
+
+/* Accent color variants controlled by Settings > buttonColor */
+:root[data-button="orange"] {
   --accent: #f59e0b;
-  --accent-soft: #fbbf24;
+  --accent-soft: #fde68a;
 }
 
-html[data-button='blue'] {
+:root[data-button="blue"] {
   --accent: #3b82f6;
-  --accent-soft: #60a5fa;
+  --accent-soft: #bfdbfe;
 }
 
-html[data-button='green'] {
+:root[data-button="green"] {
   --accent: #22c55e;
-  --accent-soft: #4ade80;
+  --accent-soft: #bbf7d0;
 }
 
-html[data-button='purple'] {
+:root[data-button="purple"] {
   --accent: #a855f7;
-  --accent-soft: #c084fc;
+  --accent-soft: #e9d5ff;
 }
 
+/* Base layout */
 html,
 body {
   height: 100%;
 }
 
 html {
-  background: radial-gradient(
-    circle at top,
-    #1f2937 0,
-    #020617 55%,
-    #000 100%
-  );
+  background:
+    radial-gradient(circle at top, rgba(148, 163, 184, 0.35) 0, transparent 55%),
+    var(--background);
 }
 
 body {
@@ -84,27 +76,22 @@ body {
   background: transparent;
 }
 
+/* Main shell wrapper used on several pages */
 .main-shell {
   min-height: 100vh;
-  background: radial-gradient(
-    circle at top,
-    rgba(249, 250, 251, 0.03),
-    transparent 60%
-  );
+  background:
+    radial-gradient(circle at top, rgba(249, 250, 251, 0.04), transparent 60%);
 }
 
+/* Generic card (used for FilmCard, etc.) */
 .card {
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.92),
-    rgba(15, 23, 42, 0.96)
-  );
+  background: var(--surface);
   border-radius: 1.25rem;
   border: 1px solid var(--border-subtle);
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
 }
 
-
+/* Scrollbars */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
@@ -123,13 +110,14 @@ body {
   border-radius: 999px;
 }
 
-
+/* Pills / tags */
 .badge-pill {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.5);
   background: rgba(15, 23, 42, 0.9);
 }
 
+/* Rounded input shell */
 .input-shell {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.5);
