@@ -19,7 +19,7 @@ export default function SettingsPage() {
     document.documentElement.setAttribute('data-button', color)
   }
 
-  // ⭐ APPLY THEME ON CHANGE
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
@@ -38,7 +38,7 @@ export default function SettingsPage() {
             Appearance
           </h2>
 
-          {/* Button color */}
+
           <div className="flex items-center justify-between py-2">
             <span>Button color</span>
             <select
@@ -53,7 +53,7 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          {/* THEME SWITCH */}
+
           <div className="flex items-center justify-between py-2">
             <span>Theme</span>
             <div className="flex gap-3">
@@ -77,7 +77,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* Notifications */}
+
         <section className={cardClass}>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Notifications
@@ -120,7 +120,7 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        {/* Language */}
+
         <section className={cardClass}>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Languages
