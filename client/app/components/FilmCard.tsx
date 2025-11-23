@@ -92,7 +92,7 @@ export default function FilmCard({ review }: Props) {
 
   return (
     <article className="card w-full max-w-3xl overflow-hidden">
-      {/* Header auteur */}
+      {/* Header author */}
       <div className="flex items-center justify-between border-b border-slate-800/70 px-5 py-4">
         <div className="flex items-center gap-3">
           {review.profiles?.avatar_url ? (
@@ -112,7 +112,7 @@ export default function FilmCard({ review }: Props) {
 
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-slate-50">
-              {review.profiles?.display_name || 'Utilisateur'}
+              {review.profiles?.display_name || 'User'}
             </span>
             <span className="text-xs text-slate-400">{formattedDate}</span>
           </div>
@@ -126,25 +126,25 @@ export default function FilmCard({ review }: Props) {
         </button>
       </div>
 
-      {/* Contenu film + notes */}
+      {/* Film content + ratings */}
       <div className="flex flex-col gap-4 px-5 py-4 md:flex-row">
         {/* Poster */}
         {film?.poster_url && (
           <div className="relative mx-auto h-60 w-40 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900 md:mx-0">
             <Image
               src={film.poster_url}
-              alt={film.title || 'Affiche du film'}
+              alt={film.title || 'Movie poster'}
               fill
               className="object-cover"
             />
           </div>
         )}
 
-        {/* Infos film / avis */}
+        {/* Film info / review */}
         <div className="flex-1 space-y-3">
           <div>
             <h2 className="text-lg font-semibold text-slate-50">
-              {film?.title || 'Titre inconnu'}
+              {film?.title || 'Unknown title'}
             </h2>
             {film?.year && (
               <p className="text-xs uppercase tracking-wide text-slate-400">
@@ -155,31 +155,31 @@ export default function FilmCard({ review }: Props) {
 
           {/* Ratings */}
           <div className="space-y-2 text-sm">
-            <RatingLine label="Scénario" value={review.scenario} />
-            <RatingLine label="Musique" value={review.music} />
-            <RatingLine label="Effets spéciaux" value={review.special_effects} />
+            <RatingLine label="Story" value={review.scenario} />
+            <RatingLine label="Music" value={review.music} />
+            <RatingLine label="VFX" value={review.special_effects} />
           </div>
 
-          {/* Avis */}
+          {/* Opinion */}
           <div className="mt-2 rounded-xl bg-slate-900/70 px-4 py-3 text-sm text-slate-100">
             <p className="leading-relaxed">{review.opinion}</p>
           </div>
         </div>
       </div>
 
-      {/* Footer : nombre de commentaires etc. */}
+      {/* Footer: comments count */}
       <div className="flex items-center gap-4 border-t border-slate-800/70 px-5 py-3 text-xs text-slate-400">
         <div className="inline-flex items-center gap-2">
           <MessageCircle className="h-4 w-4" />
-          <span>{comments.length} commentaires</span>
+          <span>{comments.length} comments</span>
         </div>
       </div>
 
-      {/* Commentaires */}
+      {/* Comments */}
       <div className="space-y-4 border-t border-slate-800/70 bg-slate-950/40 px-5 py-4">
         {comments.length === 0 && (
           <p className="text-xs italic text-slate-500">
-            Aucun commentaire pour l’instant. Sois le premier à réagir !
+            No comments yet. Be the first to comment!
           </p>
         )}
 
@@ -201,7 +201,7 @@ export default function FilmCard({ review }: Props) {
 
               <div className="flex-1">
                 <p className="text-xs font-semibold text-slate-100">
-                  {c.profiles?.display_name || 'Utilisateur'}
+                  {c.profiles?.display_name || 'User'}
                 </p>
                 <p className="text-sm text-slate-200 whitespace-pre-wrap">
                   {c.content}
@@ -219,11 +219,11 @@ export default function FilmCard({ review }: Props) {
             onClick={() => setShowAll(!showAll)}
             className="text-xs font-medium text-amber-400 hover:text-amber-300"
           >
-            {showAll ? 'Voir moins de commentaires' : 'Voir plus de commentaires'}
+            {showAll ? 'Show fewer comments' : 'Show more comments'}
           </button>
         )}
 
-        {/* Ajout commentaire */}
+        {/* Add comment */}
         <div className="flex items-center gap-2 pt-1">
           <UserAvatarMini />
 
@@ -231,7 +231,7 @@ export default function FilmCard({ review }: Props) {
             <input
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Ajouter un commentaire…"
+              placeholder="Add a comment…"
               className="flex-1 bg-transparent text-xs text-slate-100 placeholder:text-slate-500 outline-none"
             />
             <button

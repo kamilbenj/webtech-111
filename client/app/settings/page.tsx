@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export default function SettingsPage() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const [buttonColor, setButtonColor] = useState('orange')
   const [pushNotif, setPushNotif] = useState(true)
   const [mailNotif, setMailNotif] = useState(false)
@@ -14,19 +13,18 @@ export default function SettingsPage() {
 
   const toggle = (value: boolean, setter: (v: boolean) => void) => setter(!value)
 
-  useEffect(() => {
-    const root = document.documentElement
-    root.setAttribute('data-theme', theme)
-    root.setAttribute('data-button', buttonColor)
-  }, [theme, buttonColor])
+  const handleButtonColorChange = (color: string) => {
+    setButtonColor(color)
+    document.documentElement.setAttribute('data-button', color)
+  }
 
   return (
     <main className="main-shell px-4 py-6 md:px-0">
-      <div className="mx-auto flex max-w-4xl flex-col gap-6">
+      <div className="mx-auto max-w-4xl flex flex-col gap-6">
         <header>
-          <h1 className="text-xl font-semibold text-slate-50">General settings</h1>
+          <h1 className="text-xl font-semibold text-slate-50">General Settings</h1>
           <p className="text-xs text-slate-400">
-            Customize your global experience on CineVerse.
+            Customize your overall CineVerse experience.
           </p>
         </header>
 
@@ -36,37 +34,11 @@ export default function SettingsPage() {
           </h2>
 
           <div className="flex items-center justify-between py-2">
-            <span>Theme</span>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setTheme('light')}
-                className={`px-3 py-1 rounded-lg text-xs ${
-                  theme === 'light'
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                Light
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                className={`px-3 py-1 rounded-lg text-xs ${
-                  theme === 'dark'
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                Dark
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between py-2">
             <span>Button color</span>
             <select
               className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs"
               value={buttonColor}
-              onChange={(e) => setButtonColor(e.target.value)}
+              onChange={(e) => handleButtonColorChange(e.target.value)}
             >
               <option value="orange">Orange</option>
               <option value="blue">Blue</option>
