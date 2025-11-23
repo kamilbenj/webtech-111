@@ -20,7 +20,6 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [isPrivate, setIsPrivate] = useState(false)
 
-  // Local validation for display name (prevents Supabase call if invalid)
   function validateDisplayName(name: string): string | null {
     const trimmed = name.trim()
     if (!trimmed) return 'Display name is required.'
@@ -33,7 +32,6 @@ export default function SignupPage() {
     return null
   }
 
-  // Handle avatar file + preview
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
@@ -47,7 +45,6 @@ export default function SignupPage() {
     setError(null)
     setLoading(true)
 
-    // avoid creating auth user if invalid
     const displayNameError = validateDisplayName(displayName)
     if (displayNameError) {
       setError(displayNameError)
@@ -56,7 +53,6 @@ export default function SignupPage() {
     }
 
     try {
-      // Create auth user
       const { data: signUpData, error: signUpError }: AuthResponse =
         await supabase.auth.signUp({
           email,
@@ -67,7 +63,6 @@ export default function SignupPage() {
       const user = signUpData?.user
       if (!user) throw new Error('Could not retrieve created user.')
 
-      // Insert profile row
       const { error: profileError } = await supabase.from('profiles').insert([
         {
           id: user.id,
@@ -80,7 +75,6 @@ export default function SignupPage() {
       ])
       if (profileError) throw profileError
 
-      // Upload avatar if provided
       if (avatarFile) {
         const fileExt = avatarFile.name.split('.').pop()
         const filePath = `${user.id}.${fileExt}`
@@ -122,9 +116,8 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-950 via-slate-950 to-black px-4">
       <div className="mx-auto w-full max-w-md rounded-3xl border border-slate-800 bg-slate-950/90 p-8 shadow-2xl shadow-black/70">
-        {/* Header */}
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/40">
+          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] shadow-lg shadow-black/40">
             <UserPlus className="h-5 w-5 text-slate-950" />
           </div>
           <h1 className="text-2xl font-semibold text-slate-50">
@@ -135,13 +128,12 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* Avatar */}
         <div className="mb-6 flex flex-col items-center">
           <div className="relative">
             {avatarPreview ? (
               <Image
                 src={avatarPreview}
-                alt="Avatar Preview"
+                alt="Avatar preview"
                 width={96}
                 height={96}
                 className="h-24 w-24 rounded-full border-4 border-slate-800 object-cover shadow-lg"
@@ -153,7 +145,7 @@ export default function SignupPage() {
             )}
             <label
               htmlFor="avatar-upload"
-              className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40 transition hover:from-amber-300 hover:to-orange-400"
+              className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40 transition hover:brightness-105"
               title="Choose an image"
             >
               +
@@ -169,9 +161,7 @@ export default function SignupPage() {
           <p className="mt-2 text-xs text-slate-400">Profile picture</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={onSubmit} className="space-y-4">
-          {/* Email */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-300">
               * Email address
@@ -182,11 +172,10 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
             />
           </div>
 
-          {/* Password */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-300">
               * Password
@@ -197,11 +186,10 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
             />
           </div>
 
-          {/* Display name */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-300">
               * Display name
@@ -212,11 +200,10 @@ export default function SignupPage() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Public name"
               required
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
             />
           </div>
 
-          {/* Bio */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-300">Bio</label>
             <textarea
@@ -224,11 +211,10 @@ export default function SignupPage() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="Tell people a bit about you..."
               rows={3}
-              className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
             />
           </div>
 
-          {/* Profile visibility */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-300">
               Profile visibility
@@ -239,7 +225,7 @@ export default function SignupPage() {
                 onClick={() => setIsPrivate(false)}
                 className={`flex-1 rounded-2xl px-3 py-2 transition ${
                   !isPrivate
-                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40'
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40'
                     : 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'
                 }`}
               >
@@ -250,7 +236,7 @@ export default function SignupPage() {
                 onClick={() => setIsPrivate(true)}
                 className={`flex-1 rounded-2xl px-3 py-2 transition ${
                   isPrivate
-                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40'
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40'
                     : 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'
                 }`}
               >
@@ -259,29 +245,26 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* Error */}
           {error && (
             <p className="text-center text-xs font-medium text-red-400">
               {error}
             </p>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-orange-500/40 transition hover:from-amber-300 hover:to-orange-400 disabled:opacity-60"
+            className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-black/40 transition hover:brightness-105 disabled:opacity-60"
           >
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
-        {/* Link to login */}
         <p className="mt-5 text-center text-xs text-slate-400">
           Already have an account?{' '}
           <Link
             href="/login"
-            className="font-semibold text-amber-400 hover:text-amber-300"
+            className="font-semibold text-[var(--accent)] hover:text-[var(--accent-soft)]"
           >
             Log in
           </Link>

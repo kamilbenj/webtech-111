@@ -93,23 +93,22 @@ export default function FriendsPage() {
           <div>
             <h1 className="text-xl font-semibold text-slate-50">Friends</h1>
             <p className="text-xs text-slate-400">
-              Gère tes amis et découvre de nouveaux cinéphiles.
+              Manage your friends and discover new movie lovers.
             </p>
           </div>
           <div className="hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs text-slate-300 sm:flex">
             <Users className="h-4 w-4 text-slate-400" />
-            <span>{friends.length} amis</span>
+            <span>{friends.length} friends</span>
           </div>
         </header>
 
-        {/* Carte recherche */}
         <section className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 shadow-lg shadow-black/50">
           <div className="relative">
             <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100">
               <Search className="h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Rechercher un utilisateur…"
+                placeholder="Search a user…"
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full bg-transparent text-xs text-slate-100 outline-none placeholder:text-slate-500"
@@ -144,22 +143,22 @@ export default function FriendsPage() {
                       {!isSelf && !alreadyFriend && !pending && (
                         <button
                           onClick={() => sendFriendRequest(user.id)}
-                          className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow-sm shadow-orange-500/40"
+                          className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] px-3 py-1 text-[11px] font-semibold text-slate-950 shadow-sm shadow-black/40"
                         >
                           <UserPlus className="h-3 w-3" />
-                          Ajouter
+                          Add
                         </button>
                       )}
 
                       {pending && (
                         <span className="text-[11px] italic text-slate-400">
-                          En attente…
+                          Pending…
                         </span>
                       )}
 
                       {alreadyFriend && (
                         <span className="text-[11px] font-semibold text-emerald-400">
-                          Ami ✓
+                          Friend ✓
                         </span>
                       )}
                     </li>
@@ -170,18 +169,17 @@ export default function FriendsPage() {
           </div>
         </section>
 
-        {/* Liste amis */}
         <section className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 shadow-lg shadow-black/50">
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-100">
             <Users className="h-4 w-4 text-slate-400" />
-            Mes amis
+            My friends
           </h2>
 
           {loading ? (
-            <p className="text-xs text-slate-400">Chargement…</p>
+            <p className="text-xs text-slate-400">Loading…</p>
           ) : friends.length === 0 ? (
             <p className="text-xs text-slate-400">
-              Tu n’as pas encore d’amis. Invite des gens à te suivre 😄
+              You don&apos;t have any friends yet. Invite people to follow you 😄
             </p>
           ) : (
             <ul className="space-y-3">
@@ -197,7 +195,7 @@ export default function FriendsPage() {
                     />
                     <Link
                       href={`/friends/${f.id}`}
-                      className="text-sm font-medium text-slate-100 hover:text-amber-300"
+                      className="text-sm font-medium text-slate-100 hover:text-[var(--accent)]"
                     >
                       {f.display_name}
                     </Link>

@@ -146,9 +146,9 @@ export default function FeedPage() {
   ])
 
   const headerTitle = useMemo(() => {
-    if (!selectedCategoryId) return 'Last reviews'
+    if (!selectedCategoryId) return 'Latest reviews'
     const cat = categories.find((c) => c.id === selectedCategoryId)
-    return cat ? `Reviews — ${cat.name}` : 'Last reviews'
+    return cat ? `Reviews — ${cat.name}` : 'Latest reviews'
   }, [selectedCategoryId, categories])
 
   const renderRatingSelect = (
@@ -182,15 +182,12 @@ export default function FeedPage() {
   return (
     <main className="main-shell px-4 py-6 md:px-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row">
-        
-        {/* Colonne gauche : filtres */}
         <aside className="order-2 w-full space-y-4 md:order-1 md:w-64">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-200">
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Filters
             </h2>
 
-            {/* Catégorie */}
             <div className="mb-4 space-y-1">
               <label
                 htmlFor="category"
@@ -223,7 +220,7 @@ export default function FeedPage() {
               </p>
               <div className="flex flex-wrap gap-3">
                 {renderRatingSelect(
-                  'Scenario',
+                  'Story',
                   scenarioFilter,
                   setScenarioFilter,
                   'scenario-rating'
@@ -243,7 +240,6 @@ export default function FeedPage() {
               </div>
             </div>
 
-            {/* Années */}
             <div className="mt-4 space-y-2">
               <p className="text-xs font-semibold text-slate-300">
                 By year
@@ -284,24 +280,23 @@ export default function FeedPage() {
           </div>
         </aside>
 
-        {/* Colonne feed */}
         <section className="order-1 flex-1 space-y-5 md:order-2">
           <header className="flex flex-col gap-1">
             <h1 className="text-xl font-semibold text-slate-50">
               {headerTitle}
             </h1>
             <p className="text-xs text-slate-400">
-              Les critiques des films que la communauté vient de poster.
+              The latest movie reviews posted by the community.
             </p>
           </header>
 
           {loading ? (
             <div className="flex items-center justify-center py-16 text-sm text-slate-400">
-              Chargement des critiques…
+              Loading reviews…
             </div>
           ) : filteredReviews.length === 0 ? (
             <div className="flex items-center justify-center py-16 text-sm text-slate-400">
-              Aucune critique ne correspond à ces filtres.
+              No review matches these filters.
             </div>
           ) : (
             <div className="flex flex-col items-center gap-5">
@@ -312,7 +307,7 @@ export default function FeedPage() {
           )}
 
           <footer className="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-            À venir : likes, partages, et profils détaillés.
+            Coming soon: likes, shares, and detailed profiles.
           </footer>
         </section>
       </div>

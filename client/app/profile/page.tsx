@@ -57,7 +57,7 @@ export default function ProfilePage() {
       } = await supabase.auth.getUser()
 
       if (userError || !currentUser) {
-        setError('Tu dois être connecté pour voir ton profil.')
+        setError('You must be logged in to see your profile.')
         setLoading(false)
         return
       }
@@ -158,10 +158,10 @@ export default function ProfilePage() {
       setAvatarPreview(publicUrl)
       setProfile((p) => (p ? { ...p, avatar_url: publicUrl } : null))
 
-      setMessage('✅ Photo de profil mise à jour !')
+      setMessage('Profile picture updated.')
     } catch (err) {
       console.error(err)
-      setError("Erreur lors du téléchargement de l'image.")
+      setError('Error while uploading the image.')
     } finally {
       setSaving(false)
     }
@@ -181,10 +181,10 @@ export default function ProfilePage() {
       .eq('id', user.id)
 
     if (updateError) {
-      setError('Impossible de mettre à jour le profil.')
+      setError('Unable to update the profile.')
       console.error(updateError)
     } else {
-      setMessage('Profil mis à jour !')
+      setMessage('Profile updated.')
       setProfile((p) =>
         p ? { ...p, display_name: pseudo, bio, is_private: isPrivate } : null
       )
@@ -205,9 +205,9 @@ export default function ProfilePage() {
 
     const { error: authError } = await supabase.auth.updateUser(updates)
     if (authError) {
-      setError('Erreur lors de la mise à jour des identifiants.')
+      setError('Error while updating your credentials.')
     } else {
-      setMessage('Compte mis à jour !')
+      setMessage('Account updated.')
       const {
         data: { user: updatedUser },
       } = await supabase.auth.getUser()
@@ -225,7 +225,7 @@ export default function ProfilePage() {
   if (loading)
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-        Chargement…
+        Loading…
       </div>
     )
   if (error)
@@ -238,29 +238,27 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-6 lg:flex-row">
-        {/* Colonne gauche : profil */}
         <section className="w-full rounded-3xl border border-slate-800 bg-slate-950/85 p-6 shadow-xl shadow-black/70 lg:w-1/2">
           <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40">
               <UserIcon className="h-4 w-4" />
             </div>
             <div>
               <h1 className="text-sm font-semibold text-slate-50">
-                Mon profil
+                My profile
               </h1>
               <p className="text-[11px] text-slate-400">
-                Modifie ton identité et ta visibilité.
+                Edit your identity and visibility.
               </p>
             </div>
           </div>
 
-          {/* Avatar */}
           <div className="mb-6 flex flex-col items-center">
             <div className="relative">
               {avatarPreview ? (
                 <img
                   src={avatarPreview}
-                  alt="Avatar Preview"
+                  alt="Avatar preview"
                   className="h-24 w-24 rounded-full border-4 border-slate-800 object-cover shadow-lg"
                 />
               ) : (
@@ -270,7 +268,7 @@ export default function ProfilePage() {
               )}
               <label
                 htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40 transition hover:from-amber-300 hover:to-orange-400"
+                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40 transition hover:brightness-105"
               >
                 +
               </label>
@@ -288,42 +286,43 @@ export default function ProfilePage() {
               disabled={saving}
               className="mt-3 rounded-full bg-slate-900 px-4 py-1.5 text-xs font-semibold text-slate-100 shadow-sm shadow-black/30 hover:bg-slate-800 disabled:opacity-60"
             >
-              {saving ? 'Envoi...' : 'Mettre à jour la photo'}
+              {saving ? 'Uploading…' : 'Update picture'}
             </button>
           </div>
 
-          {/* Pseudo / bio / visibilité */}
           <form
             onSubmit={handleUpdateProfile}
             className="space-y-4 text-sm text-slate-200"
           >
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-300">
-                Pseudo
+                Display name
               </label>
               <input
                 type="text"
                 value={pseudo}
                 onChange={(e) => setPseudo(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
-                placeholder="Ton pseudo"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-300">Bio</label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={3}
-                className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
-                placeholder="Ta bio..."
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
+                placeholder="Your display name"
               />
             </div>
 
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-300">
-                Visibilité du profil
+                Bio
+              </label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={3}
+                className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
+                placeholder="Tell people a bit about you..."
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-300">
+                Profile visibility
               </label>
               <div className="flex gap-2">
                 <button
@@ -331,7 +330,7 @@ export default function ProfilePage() {
                   onClick={() => setIsPrivate(false)}
                   className={`flex flex-1 items-center justify-center gap-1 rounded-2xl px-3 py-2 text-[11px] font-semibold transition ${
                     !isPrivate
-                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40'
+                      ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40'
                       : 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'
                   }`}
                 >
@@ -343,12 +342,12 @@ export default function ProfilePage() {
                   onClick={() => setIsPrivate(true)}
                   className={`flex flex-1 items-center justify-center gap-1 rounded-2xl px-3 py-2 text-[11px] font-semibold transition ${
                     isPrivate
-                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40'
+                      ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40'
                       : 'border border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'
                   }`}
                 >
                   <Lock className="h-3 w-3" />
-                  Privé
+                  Private
                 </button>
               </div>
             </div>
@@ -357,39 +356,38 @@ export default function ProfilePage() {
               disabled={saving}
               className="mt-1 w-full rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-100 shadow-sm shadow-black/40 hover:bg-slate-800 disabled:opacity-60"
             >
-              {saving ? 'Sauvegarde...' : 'Mettre à jour le profil'}
+              {saving ? 'Saving…' : 'Update profile'}
             </button>
           </form>
 
-          {/* Auth infos */}
           <form
             onSubmit={handleUpdateAuth}
             className="mt-6 space-y-3 text-sm text-slate-200"
           >
             <p className="text-xs font-medium text-slate-300">
-              Email & mot de passe
+              Email & password
             </p>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+                className="rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
                 placeholder="Email"
               />
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
-                placeholder="Nouveau mot de passe"
+                className="rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
+                placeholder="New password"
               />
             </div>
             <button
               disabled={saving}
               className="w-full rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-100 shadow-sm shadow-black/40 hover:bg-slate-800 disabled:opacity-60"
             >
-              {saving ? 'Mise à jour...' : 'Mettre à jour le compte'}
+              {saving ? 'Updating…' : 'Update account'}
             </button>
           </form>
 
@@ -399,14 +397,13 @@ export default function ProfilePage() {
           {error && <div className="mt-3 text-xs text-red-400">{error}</div>}
         </section>
 
-        {/* Colonne droite : critiques */}
         <section className="w-full rounded-3xl border border-slate-800 bg-slate-950/85 p-6 shadow-xl shadow-black/70 lg:w-1/2">
           <h2 className="mb-4 text-sm font-semibold text-slate-100">
-            Mes critiques
+            My reviews
           </h2>
           {reviews.length === 0 ? (
             <p className="text-xs text-slate-400">
-              Aucune critique publiée pour le moment.
+              You haven&apos;t published any review yet.
             </p>
           ) : (
             <div className="space-y-4">
@@ -424,7 +421,7 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <span className="text-[10px] text-slate-500">
-                        Pas d’affiche
+                        No poster
                       </span>
                     )}
                   </div>
@@ -441,9 +438,8 @@ export default function ProfilePage() {
                     </h3>
                     <p className="mt-1 text-xs text-slate-300">{r.opinion}</p>
                     <div className="mt-2 text-[11px] text-slate-400">
-                      Scénario : {r.scenario ?? '-'} · Musique :{' '}
-                      {r.music ?? '-'} · Effets spéciaux :{' '}
-                      {r.special_effects ?? '-'}
+                      Story: {r.scenario ?? '-'} · Music: {r.music ?? '-'} ·
+                      VFX: {r.special_effects ?? '-'}
                     </div>
                   </div>
                 </article>

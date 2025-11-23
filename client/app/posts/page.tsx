@@ -55,7 +55,7 @@ export default function AddReviewPage() {
     setMessage('')
 
     if (!selectedFilm) {
-      setMessage('Veuillez sélectionner un film existant dans la base.')
+      setMessage('Please select an existing movie from the database.')
       setLoading(false)
       return
     }
@@ -66,7 +66,7 @@ export default function AddReviewPage() {
     } = await supabase.auth.getUser()
 
     if (userError || !user) {
-      setMessage('Tu dois être connecté pour publier une critique.')
+      setMessage('You must be logged in to publish a review.')
       setLoading(false)
       return
     }
@@ -85,9 +85,9 @@ export default function AddReviewPage() {
 
     if (error) {
       console.error('Supabase error:', JSON.stringify(error, null, 2))
-      setMessage('Erreur lors de la création de la critique.')
+      setMessage('Error while creating the review.')
     } else {
-      setMessage('Critique publiée avec succès !')
+      setMessage('Review published successfully!')
       setTitle('')
       setOpinion('')
       setScenario(5)
@@ -104,15 +104,15 @@ export default function AddReviewPage() {
     <main className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-800 bg-slate-950/85 p-6 shadow-2xl shadow-black/70">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-md shadow-orange-500/40">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-slate-950 shadow-md shadow-black/40">
             <PenSquare className="h-4 w-4" />
           </div>
           <div>
             <h1 className="text-lg font-semibold text-slate-50">
-              Ajouter une critique
+              Add a review
             </h1>
             <p className="text-xs text-slate-400">
-              Choisis un film existant et partage ton avis.
+              Pick an existing movie and share your thoughts.
             </p>
           </div>
         </div>
@@ -121,10 +121,9 @@ export default function AddReviewPage() {
           onSubmit={handleSubmit}
           className="space-y-5 text-sm text-slate-200"
         >
-          {/* Recherche film */}
           <div className="relative">
             <label className="mb-1 block text-xs font-medium text-slate-300">
-              Titre du film
+              Movie title
             </label>
             <input
               type="text"
@@ -136,8 +135,8 @@ export default function AddReviewPage() {
               }}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setTimeout(() => setIsFocused(false), 150)}
-              placeholder="Rechercher un film existant…"
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              placeholder="Search an existing movie…"
+              className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
               required
             />
 
@@ -165,31 +164,29 @@ export default function AddReviewPage() {
             )}
           </div>
 
-          {/* Avis */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-300">
-              Avis
+              Review
             </label>
             <textarea
               value={opinion}
               onChange={(e) => setOpinion(e.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30"
+              className="w-full rounded-2xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 outline-none placeholder:text-slate-500 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)]"
               rows={4}
-              placeholder="Ton avis sur le film..."
+              placeholder="Share your opinion about the movie..."
               required
             />
           </div>
 
-          {/* Notes */}
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-300">
-                Scénario
+                Story
               </label>
               <select
                 value={scenario}
                 onChange={(e) => setScenario(parseInt(e.target.value))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-amber-400"
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-[var(--accent)]"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -201,12 +198,12 @@ export default function AddReviewPage() {
 
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-300">
-                Musique
+                Music
               </label>
               <select
                 value={music}
                 onChange={(e) => setMusic(parseInt(e.target.value))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-amber-400"
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-[var(--accent)]"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -218,12 +215,12 @@ export default function AddReviewPage() {
 
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-300">
-                Effets spéciaux
+                VFX
               </label>
               <select
                 value={specialEffects}
                 onChange={(e) => setSpecialEffects(parseInt(e.target.value))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-amber-400"
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-2 py-2 text-xs text-slate-100 outline-none focus:border-[var(--accent)]"
               >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
@@ -237,9 +234,9 @@ export default function AddReviewPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-orange-500/40 transition hover:from-amber-300 hover:to-orange-400 disabled:opacity-60"
+            className="mt-2 w-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-black/40 transition hover:brightness-105 disabled:opacity-60"
           >
-            {loading ? 'Publication en cours...' : 'Publier la critique'}
+            {loading ? 'Publishing…' : 'Publish review'}
           </button>
 
           {message && (

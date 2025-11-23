@@ -99,20 +99,19 @@ export default function FriendProfile({
   if (loading)
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-        Chargement…
+        Loading…
       </div>
     )
   if (!profile)
     return (
       <div className="min-h-screen bg-slate-950 p-8 text-slate-200">
-        Profil introuvable.
+        Profile not found.
       </div>
     )
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8">
       <div className="mx-auto flex max-w-4xl flex-col gap-8">
-        {/* Header profil */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-xl shadow-black/60">
           <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:gap-6">
             <img
@@ -124,23 +123,22 @@ export default function FriendProfile({
                 {profile.display_name}
               </h1>
               <p className="mt-1 text-xs text-slate-400">
-                {profile.bio ?? 'Aucune bio.'}
+                {profile.bio ?? 'No bio yet.'}
               </p>
             </div>
           </div>
         </section>
 
-        {/* Amis en commun */}
         <section className="rounded-3xl border border-slate-800 bg-slate-950/80 p-6 shadow-xl shadow-black/60">
           <div className="mb-3 flex items-center gap-2">
             <Users className="h-4 w-4 text-slate-400" />
             <h2 className="text-sm font-semibold text-slate-100">
-              Amis en commun
+              Mutual friends
             </h2>
           </div>
 
           {commonFriends.length === 0 ? (
-            <p className="text-xs text-slate-400">Aucun ami en commun.</p>
+            <p className="text-xs text-slate-400">No mutual friends.</p>
           ) : (
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {commonFriends.map((f) => (
@@ -156,7 +154,7 @@ export default function FriendProfile({
                       src={f.avatar_url || '/default-avatar.png'}
                       className="h-9 w-9 rounded-full border border-slate-700 object-cover"
                     />
-                    <span className="text-sm font-medium text-slate-100 hover:text-amber-300">
+                    <span className="text-sm font-medium text-slate-100 hover:text-[var(--accent)]">
                       {f.display_name}
                     </span>
                   </a>
@@ -166,13 +164,12 @@ export default function FriendProfile({
           )}
         </section>
 
-        {/* Critiques */}
         <section className="space-y-4">
           <h2 className="text-sm font-semibold text-slate-100">
-            Ses critiques
+            Their reviews
           </h2>
           {reviews.length === 0 ? (
-            <p className="text-xs text-slate-400">Aucune critique publiée.</p>
+            <p className="text-xs text-slate-400">No review published yet.</p>
           ) : (
             <div className="flex flex-col items-center gap-5">
               {reviews.map((r) => (
