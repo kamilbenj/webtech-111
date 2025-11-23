@@ -126,8 +126,6 @@ export default function SettingsPage() {
             <span>Language</span>
             <select
               className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs"
-              value={buttonColor}
-              onChange={(e) => handleButtonColorChange(e.target.value)}
             >
               <option value="orange">Francais</option>
               <option value="blue">English</option>
