@@ -311,10 +311,6 @@ export default function FeedPage() {
                 ))}
               </div>
             )}
-
-            <footer className="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-              À venir : likes, partages, et profils détaillés.
-            </footer>
           </section>
         </div>
       </main>

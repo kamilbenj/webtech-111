@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) router.replace("/feed");
-      else router.replace("/login");
+      else router.replace("/feed-public");
     });
   }, [router]);
   return <p>Chargement…</p>;
