@@ -1,7 +1,5 @@
 # WebTech Lab 1 — Next.js + Supabase Authentication
 
-# WebTech Lab 1 — Next.js + Supabase Authentication
-
 ## Project Overview
 CineVerse is a Next.js application fully integrated with Supabase for authentication, database storage, and file storage.  
 It implements secure persistent sessions, protected routes, and user‑driven customization such as light/dark theme and button color selection.
@@ -79,11 +77,6 @@ npm install
 
 ### 3. Create environment variables
 Create a `.env.local` file:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://annzicukozdmiszdfbci.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFubnppY3Vrb3pkbWlzemRmYmNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDY3MTUsImV4cCI6MjA3NzY4MjcxNX0.g4_5WlgIWci0YNHDULUiF8mCUY5x3VtDNQ1UII3QtCg
-```
 
 ---
 
