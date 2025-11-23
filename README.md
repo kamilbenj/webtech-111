@@ -150,15 +150,3 @@ Verify that your Supabase Redirect URLs include:
 https://your-vercel-domain/auth/callback
 http://localhost:3000/auth/callback
 ```
-
-### “Please log in” still appears
-Ensure:
-- middleware.ts is correctly configured  
-- The cookies `sb-access-token` and `sb-refresh-token` are present  
-
-### Middleware error: MIDDLEWARE_INVOCATION_FAILED
-Happens if `createMiddlewareClient` is imported from the wrong module.  
-Use:
-```
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
-```
