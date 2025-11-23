@@ -7,6 +7,7 @@ export default function SettingsPage() {
   const [pushNotif, setPushNotif] = useState(true)
   const [mailNotif, setMailNotif] = useState(false)
   const [animations, setAnimations] = useState(true)
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
 
   const cardClass =
     'rounded-2xl border border-slate-800 bg-slate-950/60 p-5 text-sm text-slate-200'
@@ -45,6 +46,32 @@ export default function SettingsPage() {
               <option value="green">Green</option>
               <option value="purple">Purple</option>
             </select>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <span>Mode d'affichage</span>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setTheme('light')}
+                className={`px-3 py-1 rounded-lg text-xs ${
+                  theme === 'light'
+                    ? 'bg-slate-700 text-white'
+                    : 'bg-slate-800 text-slate-300'
+                }`}
+              >
+                Clair
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`px-3 py-1 rounded-lg text-xs ${
+                  theme === 'dark'
+                    ? 'bg-slate-700 text-white'
+                    : 'bg-slate-800 text-slate-300'
+                }`}
+              >
+                Sombre
+              </button>
+            </div>
           </div>
         </section>
 
@@ -87,6 +114,26 @@ export default function SettingsPage() {
             >
               {animations ? 'Enabled' : 'Disabled'}
             </button>
+          </div>
+        </section>
+
+        <section className={cardClass}>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Languages
+          </h2>
+
+          <div className="flex items-center justify-between py-2">
+            <span>Language</span>
+            <select
+              className="rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs"
+              value={buttonColor}
+              onChange={(e) => handleButtonColorChange(e.target.value)}
+            >
+              <option value="orange">Francais</option>
+              <option value="blue">English</option>
+              <option value="green">Español</option>
+              <option value="purple">Deutsch</option>
+            </select>
           </div>
         </section>
       </div>
