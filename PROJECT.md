@@ -118,9 +118,9 @@ profiles, reviews, review_comments, review_likes, review_comment_likes, films, c
 
 *What is the technically most difficult or most polished feature you built?*
 
-[BENJELOUN Kamil]: My proudest achievement is implementing the complete authentication workflow and implementing the filtering logic.
+BENJELOUN Kamil: My proudest achievement is implementing the complete authentication workflow and implementing the filtering logic.
 
-[Name 2]: [Your answer here]
+DALIBERT Gabriel: I designed the movie review cards by integrating all the relevant information—movie details, user profiles, and comments—while connecting multiple tables in a coherent way. This required implementing RLS rules to ensure that each user could only access the data they were authorized to see.
 
 [Name 3]: [Your answer here]
 
@@ -128,8 +128,8 @@ profiles, reviews, review_comments, review_likes, review_comment_likes, films, c
 
 *If you had more time, what would you add or improve in your project?*
 
-[BENJELOUN Kamil]: If I had more time, I would add the ability to edit and delete reviews, implement real-time notifications for comments and friend requests, and finish full multilingual support.
+BENJELOUN Kamil: If I had more time, I would add the ability to edit and delete reviews, implement real-time notifications for comments and friend requests, and finish full multilingual support.
 
-[Name 2]: [Your answer here]
+DALIBERT Gabriel: To improve this project, I would have liked to add the ability for users to delete and edit their own posts and comments. I also would have wanted to implement an automated system to populate the movie database with images and information in order to have a complete set of film and use the website for real.
 
 [Name 3]: [Your answer here]
