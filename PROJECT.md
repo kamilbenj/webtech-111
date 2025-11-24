@@ -118,7 +118,7 @@ profiles, reviews, review_comments, review_likes, review_comment_likes, films, c
 
 *What is the technically most difficult or most polished feature you built?*
 
-[Name 1]: [Your answer here]
+[BENJELOUN Kamil]: My proudest achievement is implementing the complete authentication workflow and implementing the filtering logic.
 
 [Name 2]: [Your answer here]
 
@@ -128,17 +128,7 @@ profiles, reviews, review_comments, review_likes, review_comment_likes, films, c
 
 *If you had more time, what would you add or improve in your project?*
 
-[Name 1]: [Your answer here]
-
-[Name 2]: [Your answer here]
-
-[Name 3]: [Your answer here]
-
-### Course Feedback (Bonus)
-
-*What did you enjoy about this course? What could be improved for next year?*
-
-[Name 1]: [Your answer here]
+[BENJELOUN Kamil]: If I had more time, I would add the ability to edit and delete reviews, implement real-time notifications for comments and friend requests, and finish full multilingual support.
 
 [Name 2]: [Your answer here]
 
