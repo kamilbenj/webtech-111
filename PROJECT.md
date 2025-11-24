@@ -1,4 +1,4 @@
-# Project Name: [Insert Name Here]
+# Project Name: CineVerse
 
 - **Team Members:**
   - Gabriel DALIBERT
@@ -12,64 +12,71 @@
 
 ### Key Features (UI/UX)
 
-*Provide a few screenshots or a short animated GIF demonstrating some of the key features of your application.*
-
-[INSERT SCREENSHOTS/GIFS HERE]
+![1.1](./images/1.1.png)
+![1.2](./images/1.2.png)
+![1.3](./images/1.3.png)
+![1.4](./images/1.4.png)
+![1.5](./images/1.5.png)
+![1.6](./images/1.6.png)
 
 ---
 
 ## 2. Full-Stack Functionality
 
-*Briefly describe how you implemented the core requirements. Keep it concise (1-2 sentences per item).*
-
 ### Authentication
 
-- [x] Sign-up implemented
-- [x] Sign-in implemented
+- [x] Sign-up implemented (with username, avatar, bio, privacy)
+- [x] Sign-in implemented (email + password)
 - [x] Sign-out implemented
 - [x] The UI updates based on user state
 
-**Notes**: [Your notes here (optional)]
+**Notes**: Session handled through supabase.auth, protected routes, middleware, and redirections.
 
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**: Fully implemented and stable.
 
 ### CRUD Operations
 
 - **Main Resource:** [e.g., "Recipes"]
-- [ ] Create
-- [ ] Read
-- [ ] Update
-- [ ] Delete
+- [x] Create (write a review)
+- [x] Read (feed, public feed, profile pages)
+- [ ] Update (not implemented)
+- [ ] Delete (not implemented)
 
-**Notes**: [Your notes here (optional)]
+**Notes**: Creation + display fully functional, no editing or deletion.
 
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**: Partial (2/4 functionalities implemented).
 
 ### Data Relationships
 
-- **Tables Involved:** [e.g., "Users" and "Posts"]
-- [x] Relationship implemented
+- **Tables Involved:** 
+- [x] Relationship implemented 
 
-**Notes**: [Your notes here (optional)]
-**Self-Evaluation:**: [Your self-evaluation here]
+Tables Involved:
+profiles, reviews, review_comments, review_likes, review_comment_likes, films, categories, film_categories, friendships
+
+**Notes**: Several complex relationships handled correctly, including nested selects.
+**Self-Evaluation:**: Strong implementation beyond minimum requirements.
 
 ### Search & Filtering
 
 - [x] Search implemented
-- [x] Filter implemented, available options: [e.g., "by category", "by date"]
+- [x] Filter implemented, available options:
+- by category
+- by year
+- by scenario rating
+- by music rating
+- by VFX rating
 
-**Notes**: [Your notes here (optional)]
-
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**: Complete.
 
 ### External API Integration
 
-- **API Used:** [Name and URL of the API]
-- **Data fetched:** [What data are you getting?]
+- **API Used:** none
+- **Data fetched:** N/A (all data stored in Supabase)
 
-**Notes**: [Your notes here (optional)]
+**Notes**: All data handled internally through Supabase.
 
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**:
 
 ---
 
@@ -77,33 +84,29 @@
 
 ### Database Schema
 
-*Provide a screenshot of your Supabase Table Editor or a text description of your tables and relationships.*
+![3.1](./images/3.1.png)
 
-[INSERT SCHEMA SCREENSHOT HERE]
-
-**Notes**: [Your notes here (optional)]
-
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**: Strong schema structure.
 
 ### Row Level Security (RLS)
 
-*Provide a screenshot of the **Supabase Authentication > Policies** dashboard showing your active policies. This is mandatory.*
+![3.2.1](./images/3.2.1.png)
+![3.2.2](./images/3.2.2.png)
+![3.2.3](./images/3.2.3.png)
 
-[INSERT RLS DASHBOARD SCREENSHOT HERE]
+**Notes**: RLS is fully configured across all tables, with precise policies ensuring correct permissions for read and write operations depending on user identity.
 
-**Notes**: [Your notes here (optional)]
-
-**Self-Evaluation:**: [Your self-evaluation here]
+**Self-Evaluation:**: Implemented RLS correctly, ensuring secure data access while maintaining full functionality across the app.
 
 ### Server vs. Client Components
 
 *Identify one significant Server Component and one Client Component in your app.*
 
-**Server Component:** [File path, e.g., `src/app/dashboard/page.tsx`]
-    - *Why?* [e.g., "Directly fetches data from Supabase to ensure SEO and performance."]
+**Server Component:** [app/feed-public/page.tsx]
+    - *Why?* Fetches all public reviews server-side to improve SEO and reduce client-side load.
 
-**Client Component:** [File path, e.g., `src/components/LikeButton.tsx`]
-    - *Why?* [e.g., "Needs access to `onClick` handlers and React state."]
+**Client Component:** [app/components/FilmCard.tsx]
+    - *Why?* Contains interactive UI (comment posting, toggles, stateful UI), requiring hooks and onClick handlers.
 
 ---
 
